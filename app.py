@@ -288,9 +288,15 @@ def run_pipeline_streaming(trace_slot, log_slot) -> bool:
 # ── Sidebar ───────────────────────────────────────────────────────────────────
 
 with st.sidebar:
-    st.image(
-        "https://upload.wikimedia.org/wikipedia/commons/5/51/IBM_logo.svg",
-        width=120,
+    st.markdown(
+        """
+        <div style="padding-bottom: 15px;">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/5/51/IBM_logo.svg" 
+                 style="width: 140px; height: auto; border-radius: 0; object-fit: contain;" 
+                 alt="IBM">
+        </div>
+        """,
+        unsafe_allow_html=True,
     )
     st.markdown("## 📡 Expiry Radar")
     st.caption("IBM Bob 2.0 Hackathon · Team Project")

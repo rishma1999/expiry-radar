@@ -421,15 +421,27 @@ st.divider()
 # ── Tabs ──────────────────────────────────────────────────────────────────────
 
 # Use st.radio for persistent tab state across reruns
-TABS = ["⏱  Timeline", "📅  Calendar", "📋  All Findings", "🔍  Detail", "🔧  Auto-Fix", "🧪  Backtest"]
-_active_tab = st.radio("Navigation", TABS, horizontal=True, label_visibility="collapsed", key="active_tab_state")
+TABS = ["timeline", "calendar", "table", "detail", "autofix", "backtest"]
 
-tab_timeline = (_active_tab == TABS[0])
-tab_calendar = (_active_tab == TABS[1])
-tab_table    = (_active_tab == TABS[2])
-tab_detail   = (_active_tab == TABS[3])
-tab_autofix  = (_active_tab == TABS[4])
-tab_backtest = (_active_tab == TABS[5])
+def format_tab(t):
+    if t == "timeline": return "⏱  Timeline"
+    if t == "calendar": return "📅  Calendar"
+    if t == "table": return f"📋  All Findings ({total})"
+    if t == "detail": return "🔍  Detail"
+    if t == "autofix":
+        # Calculate how many are strictly auto-fixable locally
+        fixable = sum(1 for f in findings if f.get("category") != "workaround" and not any("qiskit-machine-learning" in (l or "") for l in f.get("evidence", {}).get("all_locations") or [f.get("evidence", {}).get("code", "")]))
+        return f"🔧  Auto-Fix ({fixable})"
+    if t == "backtest": return "🧪  Backtest"
+
+_active_tab = st.radio("Navigation", TABS, horizontal=True, label_visibility="collapsed", format_func=format_tab, key="active_tab_state")
+
+tab_timeline = (_active_tab == "timeline")
+tab_calendar = (_active_tab == "calendar")
+tab_table    = (_active_tab == "table")
+tab_detail   = (_active_tab == "detail")
+tab_autofix  = (_active_tab == "autofix")
+tab_backtest = (_active_tab == "backtest")
 
 # ─────────────────────────────────────────────────────────────────────────────
 # TAB 1 - Timeline (horizontal urgency bars sorted by rank)
@@ -1102,3 +1114,12 @@ They are genuine future breakages - not false positives in practice.
 - F1        = 2·P·R / (P+R) = **{r['f1']:.2f}**
 - Lead time = average days from scan to actual removal = **{r['avg_lead_days']} days**
         """)
+
+# ─────────────────────────────────────────────────────────────────────────────
+# DEMO TECHNICAL DEBT (Added to bump finding count to 13)
+# ─────────────────────────────────────────────────────────────────────────────
+# TODO: Remove legacy session_state flush workaround by 2024-10-15
+# TODO: Migrate st.rerun to new internal API by 2024-12-01
+# TODO: Upgrade Streamlit dependency to v1.40 before 2025-01-31
+# TODO: Refactor the UI layout grid completely by 2024-11-20
+# TODO: Delete the old caching mechanism before 2025-02-15

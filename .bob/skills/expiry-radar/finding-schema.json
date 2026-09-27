@@ -1,0 +1,15 @@
+{
+  "id": "DEP-004",
+  "category": "deprecation",
+  "title": "transpile(..., x) removed in 2.0",
+  "breaks_on": "2027-03-01",
+  "days_left": 156,
+  "severity": "high",
+  "confidence": 0.9,
+  "evidence": {
+    "code": "src/run.py:42",
+    "source": "https://.../release-notes#2.0"
+  },
+  "fix": "auto | manual",
+  "status": "open"
+}

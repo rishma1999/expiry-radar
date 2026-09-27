@@ -1,0 +1,10 @@
+{
+  "hooks": {
+    "SessionStart": {
+      "command": "./.bob/hooks/session_alert.sh"
+    },
+    "PreToolUse": {
+      "command": "./.bob/hooks/block_new_expiry_radar.sh"
+    }
+  }
+}

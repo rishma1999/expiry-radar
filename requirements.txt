@@ -1,0 +1,6 @@
+requests
+packaging
+cryptography
+rank_bm25
+pydantic
+streamlit

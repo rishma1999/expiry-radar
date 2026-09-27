@@ -1,0 +1,5 @@
+customModes:
+  - id: expiry-radar
+    name: Expiry Radar Scan Mode
+    description: Custom mode for scanning the repository for expiration dates.
+    fileRegex: ^\.expiry-radar/.*$

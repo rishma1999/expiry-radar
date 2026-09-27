@@ -1,0 +1,105 @@
+Expiry Radar
+Build plan for the IBM Bob 2.0 hackathon (24 hours, 2 people)
+Pitch: "Everything in your codebase has a hidden expiration date. We find it before production does." Expiry Radar finds workarounds whose upstream fix already shipped, APIs with sunset dates, end-of-life runtimes and libraries, expiring certificates, dated TODOs, and hardcoded dates, then shows a calendar of future breakages and auto-fixes the nearest ones.
+0. Do this first: a real time bomb in your own toolchain
+Bob's docs say IDE v1.0.3 and v2.0.0 stop working on September 30, 2026. If you are on v1.0.3, upgrade to the latest v2.0.x; if you are on v2.0.0, upgrade to v2.0.2 or later. Do it now so it doesn't hit you mid-hackathon.
+Then use it as your demo opener: "Even the tool we used to build this has a time bomb going off this week."
+1. Architecture
+The key design idea comes from how IBM builds Bob's own Workflows: use deterministic code for known, structured processes, and send only the steps that need reasoning to the AI. Python scripts do the cheap scanning; Bob reads changelogs, judges impact and writes fixes.
+ 
+Figure 1. Expiry Radar data flow
+What each layer does
+1.	Collectors (Python, no AI). List every dependency and its version, grep for dates, TODOs and workaround / issues/ links, find certificate files, and call free APIs (endoflife.date, GitHub issues, PyPI). Output: a small candidates.json. Each subagent gets a tiny, clean input instead of the whole repo.
+2.	Four parallel subagents (Bob). Each takes one category and does the reasoning, for example: "The changelog says execute() is removed in 2.0. Is it actually called here, and where?"
+3.	Scoring (Python). Ranks every finding by days until it breaks, how much code it touches, and how confident the evidence is.
+4.	Outputs. A timeline dashboard, fix PRs for the nearest items, and hooks that keep warning (and blocking) in future sessions.
+The evidence rule: every finding must carry a file:line in your code plus a URL to the source document. No evidence, no finding. This stops hallucinated bombs, and judges will ask about hallucination.
+2. Using Bob's features smartly
+Bob feature	How Expiry Radar uses it
+Custom mode	Create an expiry-radar mode in .bob/custom_modes.yaml. Use fileRegex to restrict edits so the scan mode can only write reports into .expiry-radar/. Great safety story.
+Skill	Put the pipeline in .bob/skills/expiry-radar/SKILL.md. Skills can include supporting files (scripts, checklists, reference docs), so collectors, severity guide and finding schema all live inside the skill: your "workflow in a box".
+Subagents	Use the read-only explore type (lighter model, cheaper, safer) for the 4 scanners and general (full tools) only for fixes. Bob's parallel subagents panel shows completed count, tools used, tokens, cost and elapsed time: screenshot it for your metrics slide.
+Plan → Agent mode	Plan mode reviews ranked findings and proposes fixes; Bob can switch into Agent mode once the plan is ready and implement them.
+Lifecycle hooks	Secret weapon. SessionStart stdout is injected as context, so every new session opens with "3 time bombs within 30 days". A PreToolUse hook exiting with code 2 blocks writing new hardcoded dates with no expiry tag: detection becomes prevention.
+Rollback	If an auto-fix breaks tests, roll back and mark the finding "needs human".
+MCP (optional)	A GitHub MCP server for reading issues and opening PRs. Otherwise the gh CLI via execute works fine.
+
+Suggested .bob folder layout
+.bob/
+  custom_modes.yaml          # the expiry-radar mode
+  settings.json              # SessionStart + PreToolUse hooks
+  rules-expiry-radar/        # evidence + severity rules
+  skills/expiry-radar/
+    SKILL.md                 # the pipeline steps
+    finding-schema.json
+    severity-guide.md
+    scripts/collect_*.py  score.py  backtest.py
+  hooks/session_alert.sh  block_new_bombs.sh
+A note on Workflows
+Bob ships two built-in Workflows, and specialized ones come through Premium packages. It isn't confirmed that you can author a custom Workflow, so build the same pattern with Skill + scripts + subagents (deterministic steps, then AI steps, then a human approval gate) and say in your pitch that it follows IBM's Workflow design.
+A note on RAG
+You don't need a vector database. Changelogs are small and structured. Do targeted retrieval: the collector fetches release notes, keeps only sections mentioning packages or APIs you actually use (keyword or BM25 match), and passes those snippets to the subagent. Show the token savings as a metric.
+3. Tech stack (keep it boring)
+•	Python 3.12 for collectors and scoring: requests (APIs), packaging (version comparison), tomllib (pyproject.toml), cryptography (cert expiry), rank_bm25 (retrieval), pydantic (finding schema).
+•	Data sources: endoflife.date API (v1, in beta, so cache responses locally), GitHub REST API or gh CLI, PyPI JSON.
+•	Dashboard: one static HTML file with Chart.js or vis-timeline that reads findings.json. No backend.
+•	Bob: custom mode + skill + hooks, all committed in .bob/, which also shows the setup is shareable with the whole team.
+Finding schema (the contract between every step)
+{ "id": "DEP-004", "category": "deprecation",
+  "title": "transpile(..., x) removed in 2.0",
+  "breaks_on": "2027-03-01", "days_left": 156,
+  "severity": "high", "confidence": 0.9,
+  "evidence": { "code": "src/run.py:42",
+                "source": "https://.../release-notes#2.0" },
+  "fix": "auto | manual", "status": "open" }
+4. Data: use Qiskit
+Qiskit is IBM's quantum SDK: large, Python + Rust, and heavy on deprecations. Its official version strategy is a real document for Bob to "understand": the previous major version gets at least six months of bug fixes and one year of security fixes, and supported Python versions and dependency minimums can change in any release. That is a time-bomb generator for everyone downstream.
+The trick that wins: backtesting
+1.	Take an older snapshot, e.g. a 2023 tag of a Qiskit-dependent repo such as qiskit-machine-learning or the Qiskit community tutorials.
+2.	Run Expiry Radar on it as if it were 2023.
+3.	Check git history for what actually broke afterwards (Qiskit 1.0 removed many previously deprecated modules).
+4.	Report: "We predicted X of the Y breakages that really happened, with an average of Z months' warning." Real accuracy data, not a toy claim.
+Two more targets
+•	Current Qiskit main for real, live findings (for example, Python 3.10 reaches end-of-life in October 2026).
+•	A small planted demo repo with 6 to 8 bombs you control, so the live auto-fix demo never fails.
+5. Build plan: 24 hours, 2 people
+Build the ugliest end-to-end version first, then improve. A working pipeline at hour 8 beats a perfect scanner at hour 20.
+Hours	Goal	Person A (Python)	Person B (Bob)	Done when
+0-2	Setup	Upgrade Bob to 2.0.2+, clone Qiskit + snapshot, write schema	Create .bob/, custom mode, empty skill	Bob loads your mode and skill
+2-8	MVP	Collectors for dated TODOs / hardcoded dates + EOL runtimes / deps	Skill: run collectors → spawn 2 explore subagents → write findings.json	One command gives real findings on Qiskit
+8-13	Full scan	Workaround collector (issue status vs installed version) + release-notes retrieval	Add other 2 subagents, run all 4 in parallel, enforce evidence rule	4 categories run in parallel
+13-17	Act	Scoring + timeline dashboard HTML	Plan → Agent fix flow on planted repo: fix, test, roll back if red, open PR	3 fix PRs with green tests
+17-20	Prevent + prove	Backtest script: 2023 predictions vs later breakages	SessionStart alert hook + PreToolUse block hook	Metrics table filled with real numbers
+20-22	Feature freeze	Record a backup demo video	Slides	Nothing new added
+22-24	Rehearse	Run the demo 3 times	Tighten the pitch	Under 3 minutes, every time
+
+Tip: sleep in shifts around hours 13-17. Tired teams break working demos at hour 22.
+6. Metrics for both audiences
+What to measure	Tech people hear	CEOs hear
+Findings by severity and date	"23 items, 4 critical within 90 days"	"4 outages already scheduled that nobody knew about"
+Backtest precision and lead time	"Predicted 8 of 10 real breakages, avg 7 months early"	"7 months' warning instead of a 2 a.m. incident"
+Scan time vs manual audit	"Full scan in N minutes vs ~X hours by hand"	"An engineer-week saved per audit"
+Auto-fix rate	"9 PRs opened, 8 passed tests"	"Most fixes need only a review"
+Token savings from collectors	"Pre-filtering cut tokens by X% vs dumping the repo"	"Cheap enough to run every week"
+Example numbers are placeholders; replace them with your measured results.
+Keep the numbers honest
+•	Measure the manual baseline yourselves. One of you audits one category by hand for 30 minutes; extrapolate from that. Don't invent industry numbers.
+•	Label any dollar figure as an assumption, e.g. "at $X/hour loaded engineer cost." Judges respect stated assumptions and distrust made-up ones.
+CEO pitch: "Every other tool tells you what's broken today. Expiry Radar tells you what will break next quarter, proves it with history, and fixes most of it before anyone notices."
+7. The 3-minute demo
+1.	(20s) Hook: Bob's own September 30 deadline.
+2.	(40s) Run the radar on Qiskit; the parallel subagents panel lights up.
+3.	(40s) Walk through the timeline dashboard: "your code breaks on these dates."
+4.	(40s) Auto-fix: a PR is opened and the tests pass.
+5.	(20s) Backtest slide: "we predicted what really broke."
+6.	(20s) Start a new Bob session: the hook warns you, then blocks a new hardcoded date.
+Sources
+•	https://bob.ibm.com/docs/ide (upgrade deadline, features overview)
+•	https://bob.ibm.com/docs/ide/features/subagents
+•	https://bob.ibm.com/docs/ide/features/skills
+•	https://bob.ibm.com/docs/ide/features/modes
+•	https://bob.ibm.com/docs/ide/configuration/custom-modes
+•	https://bob.ibm.com/docs/ide/configuration/lifecycle-hooks
+•	https://heidloff.net/article/workflows-sub-agents-ibm-bob/ (Workflows design)
+•	https://quantum.cloud.ibm.com/docs/en/open-source/qiskit-sdk-version-strategy
+•	https://endoflife.date/docs/api/v1/

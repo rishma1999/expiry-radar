@@ -315,6 +315,17 @@ with st.sidebar:
     if st.button("🔄  Run All Collectors", use_container_width=True):
         st.session_state["show_trace"] = True
         st.rerun()
+        
+    if st.button("🗑️  Reset Demo Data", use_container_width=True):
+        import glob
+        # Delete generated JSON files from previous runs
+        for f in glob.glob("*.json") + glob.glob(".bob/skills/expiry-radar/scripts/*.json"):
+            if "schema" not in f and "settings" not in f:
+                try: os.remove(f)
+                except: pass
+        # Clear Streamlit session state
+        st.session_state.clear()
+        st.rerun()
 
     st.divider()
     st.caption(f"Data: `{SCORED_PATH}`")

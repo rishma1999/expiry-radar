@@ -1,0 +1,11 @@
+# Prevent Bob from reading, modifying, or exposing credentials
+.env
+.env.local
+.env.*
+*.pem
+*.key
+credentials.json
+ibm-cloud-api-key.txt
+
+# Ignore nested git repos
+.git/

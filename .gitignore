@@ -1,0 +1,25 @@
+# Credentials and Environment Variables (CRITICAL: DO NOT REMOVE)
+.env
+.env.local
+.env.*
+*.pem
+*.key
+credentials.json
+ibm-cloud-api-key.txt
+
+# Virtual Environments & Python
+venv/
+env/
+.venv/
+__pycache__/
+*.pyc
+
+# Mac/OS
+.DS_Store
+
+# Expiry Radar local scan outputs (Don't commit local test data)
+candidates.json
+eol_candidates.json
+findings.json
+todo_findings.json
+todo_analysis.json

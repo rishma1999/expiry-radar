@@ -779,47 +779,89 @@ with tab_autofix:
     st.markdown("---")
     st.markdown("#### Step 4 — Pull Request")
 
-    # Detect if fix branch exists and has commits ahead of main
-    branch_exists = subprocess.run(
-        ["git", "rev-parse", "--verify", "fix/auto-remediate-eol-and-collectors"],
-        capture_output=True
-    ).returncode == 0
+    FIX_BRANCH = "fix/eol-pin-dependencies"
 
-    ahead_count = 0
-    if branch_exists:
-        r = subprocess.run(
-            ["git", "rev-list", "--count", "main..fix/auto-remediate-eol-and-collectors"],
-            capture_output=True, text=True
-        )
-        ahead_count = int(r.stdout.strip() or "0")
-
-    # Check if requirements.txt has the fixes applied
+    # Check if requirements.txt has the fixes applied (from Step 2 buttons)
     req_content = _read_req()
     eol001_fixed = "cryptography>=" in req_content
     eol002_fixed = "pydantic>=" in req_content
     fixes_applied = eol001_fixed and eol002_fixed
 
-    # Git diff of requirements.txt vs main
+    # Detect if fix branch already exists
+    branch_exists = subprocess.run(
+        ["git", "rev-parse", "--verify", FIX_BRANCH],
+        capture_output=True
+    ).returncode == 0
+
+    ahead_count = 0
+    if branch_exists:
+        rc = subprocess.run(
+            ["git", "rev-list", "--count", f"main..{FIX_BRANCH}"],
+            capture_output=True, text=True
+        )
+        ahead_count = int(rc.stdout.strip() or "0")
+
+    # Git diff of requirements.txt vs HEAD
     diff_result = subprocess.run(
-        ["git", "diff", "main", "--", "requirements.txt"],
+        ["git", "diff", "HEAD", "--", "requirements.txt"],
         capture_output=True, text=True
     )
     diff_text = diff_result.stdout.strip()
 
+    # ── "Commit & push" button ────────────────────────────────────────────────
+    if fixes_applied and not (branch_exists and ahead_count > 0):
+        st.markdown(
+            '<div class="fix-card-blocked" style="border-color:#58a6ff">'
+            '🔵  <strong>Fixes applied to requirements.txt.</strong> '
+            'Click below to create a fix branch and push the PR.'
+            '</div>',
+            unsafe_allow_html=True,
+        )
+        if st.button("🚀  Commit fixes & push branch", use_container_width=False, type="primary"):
+            cmds = [
+                ["git", "checkout", "-b", FIX_BRANCH],
+                ["git", "add", "requirements.txt"],
+                ["git", "commit", "-m",
+                 "fix(deps): pin cryptography>=44.0.0 and pydantic>=2.0.0\n\n"
+                 "EOL-001: cryptography <44 reached EOL 2026-10-01\n"
+                 "EOL-002: pydantic v1 reached EOL 2024-06-30 (819 days past due)\n"
+                 "Auto-fixed by Expiry Radar"],
+                ["git", "push", "origin", FIX_BRANCH],
+            ]
+            log_lines = []
+            ok = True
+            for cmd in cmds:
+                res = subprocess.run(cmd, capture_output=True, text=True)
+                log_lines.append(f"$ {' '.join(cmd)}")
+                if res.stdout.strip():
+                    log_lines.append(res.stdout.strip())
+                if res.returncode != 0:
+                    log_lines.append(f"⚠ {res.stderr.strip()[:300]}")
+                    ok = False
+                    break
+            st.code("\n".join(log_lines), language="bash")
+            if ok:
+                st.session_state["branch_pushed"] = True
+                st.success(f"✅  Branch `{FIX_BRANCH}` pushed to GitHub!")
+                st.rerun()
+            else:
+                st.error("Push failed — see log above.")
+
     # Status summary
-    if branch_exists and ahead_count > 0:
+    pushed = st.session_state.get("branch_pushed") or (branch_exists and ahead_count > 0)
+    if pushed:
         st.markdown(
             f'<div class="fix-card-done">'
             f'<strong>✅  Fix branch ready</strong> — '
-            f'<code>fix/auto-remediate-eol-and-collectors</code> is '
-            f'<strong>{ahead_count} commit(s) ahead</strong> of <code>main</code>'
+            f'<code>{FIX_BRANCH}</code> pushed to GitHub'
             f'</div>',
             unsafe_allow_html=True,
         )
-    else:
+    elif not fixes_applied:
         st.markdown(
             '<div class="fix-card-blocked">'
-            '<strong>⏳  Apply fixes above first</strong>, then commit and push to create the branch.'
+            '<strong>⏳  Apply fixes above first</strong> using the ✅ Apply fix buttons, '
+            'then the commit & push button will appear here.'
             '</div>',
             unsafe_allow_html=True,
         )
@@ -841,7 +883,7 @@ with tab_autofix:
 
     # PR action
     st.markdown("**Open PR on GitHub:**")
-    pr_url = "https://github.com/rishma1999/expiry-radar/pull/new/fix/auto-remediate-eol-and-collectors"
+    pr_url = f"https://github.com/rishma1999/expiry-radar/pull/new/{FIX_BRANCH}"
 
     st.markdown(
         f'<div class="pr-box">'

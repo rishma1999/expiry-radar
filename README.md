@@ -8,7 +8,7 @@ IBM Bob 2.0 Hackathon - **Expiry Radar** scans a codebase for end-of-life depend
 
 ## Live Demo
 
-**Streamlit Cloud app:** _(deploy from [share.streamlit.io](https://share.streamlit.io) - repo: this repo, file: `app.py`)_
+**Streamlit Cloud app:** https://rishma1999-expiry-radar-app.streamlit.app/
 
 **GitHub repository:** [github.com/rishma1999/expiry-radar](https://github.com/rishma1999/expiry-radar)
 

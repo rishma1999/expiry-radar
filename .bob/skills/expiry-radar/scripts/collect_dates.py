@@ -3,9 +3,13 @@ import re
 import glob
 
 def main():
-    # Regex to find standard dates and TODOs with a year
+    # Regex to find standard dates and TODOs with a year.
+    # date_pattern: ISO-style dates in code (2024-01-15 or 2024/01/15)
     date_pattern = re.compile(r'20\d{2}[-/]\d{2}[-/]\d{2}')
-    todo_pattern = re.compile(r'(?i)TODO.*20\d{2}')
+    # todo_pattern: only match TODO/FIXME/HACK in actual code comments
+    # (lines starting with #, //, or /* after optional whitespace) to
+    # avoid false positives from prose, docstrings, and author surnames.
+    todo_pattern = re.compile(r'(?:#|//|/\*)\s*(?:TODO|FIXME|HACK).*20\d{2}', re.IGNORECASE)
     
     candidates = []
     

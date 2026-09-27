@@ -12,43 +12,7 @@ IBM Bob 2.0 Hackathon - **Expiry Radar** scans a codebase for end-of-life depend
 
 **GitHub repository:** [github.com/rishma1999/expiry-radar](https://github.com/rishma1999/expiry-radar)
 
----
-
-## Demo Script - Step by Step
-
-### 0 · One-time setup
-
-```bash
-# Clone and install
-git clone https://github.com/rishma1999/expiry-radar.git
-cd expiry-radar
-pip install -r requirements.txt
-```
-
-Deploy to Streamlit Cloud:
-1. Go to [share.streamlit.io](https://share.streamlit.io) → **New app**
-2. Repository: `rishma1999/expiry-radar` · Branch: `main` · File: `app.py`
-3. Copy the app URL (e.g. `https://expiry-radar.streamlit.app`)
-4. Set it for the demo: `export STREAMLIT_URL=https://expiry-radar.streamlit.app`
-
----
-
-### 1 · Reset to a fresh state
-
-```bash
-bash demo_reset.sh
-```
-
-What it does:
-- ✅ Switches to `main` branch
-- ✅ Deletes any leftover local fix branches
-- ✅ Removes all generated `*.json` pipeline artifacts
-- ✅ Resets `requirements.txt` to unpinned (so EOL findings appear live)
-- ✅ Verifies all 5 collector scripts are present
-
----
-
-### 2 · Run the agentic pipeline (terminal view)
+### Run the agentic pipeline (terminal view)
 
 ```bash
 bash demo_run.sh

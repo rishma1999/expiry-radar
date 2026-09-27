@@ -420,15 +420,22 @@ st.divider()
 
 # ── Tabs ──────────────────────────────────────────────────────────────────────
 
-tab_timeline, tab_calendar, tab_table, tab_detail, tab_autofix, tab_backtest = st.tabs([
-    "⏱  Timeline", "📅  Calendar", "📋  All Findings", "🔍  Detail", "🔧  Auto-Fix", "🧪  Backtest"
-])
+# Use st.radio for persistent tab state across reruns
+TABS = ["⏱  Timeline", "📅  Calendar", "📋  All Findings", "🔍  Detail", "🔧  Auto-Fix", "🧪  Backtest"]
+_active_tab = st.radio("Navigation", TABS, horizontal=True, label_visibility="collapsed", key="active_tab_state")
+
+tab_timeline = (_active_tab == TABS[0])
+tab_calendar = (_active_tab == TABS[1])
+tab_table    = (_active_tab == TABS[2])
+tab_detail   = (_active_tab == TABS[3])
+tab_autofix  = (_active_tab == TABS[4])
+tab_backtest = (_active_tab == TABS[5])
 
 # ─────────────────────────────────────────────────────────────────────────────
 # TAB 1 - Timeline (horizontal urgency bars sorted by rank)
 # ─────────────────────────────────────────────────────────────────────────────
 
-with tab_timeline:
+if tab_timeline:
     st.markdown("### Breaking Changes Timeline")
     st.caption(
         "Bars show urgency - longer/redder = closer to deadline. "
@@ -478,7 +485,7 @@ with tab_timeline:
 # TAB 2 - Calendar (month-grouped list of upcoming breaks)
 # ─────────────────────────────────────────────────────────────────────────────
 
-with tab_calendar:
+if tab_calendar:
     st.markdown("### Breakage Calendar")
     st.caption("Findings grouped by the month they are projected to break.")
 
@@ -553,7 +560,7 @@ with tab_calendar:
 # TAB 3 - All Findings table
 # ─────────────────────────────────────────────────────────────────────────────
 
-with tab_table:
+if tab_table:
     st.markdown("### All Findings")
 
     rows = []
@@ -602,7 +609,7 @@ with tab_table:
 # TAB 5 - Auto-Fix workflow
 # ─────────────────────────────────────────────────────────────────────────────
 
-with tab_autofix:
+if tab_autofix:
     st.markdown("### 🔧 Auto-Fix Workflow")
     st.caption(
         "Expiry Radar reviews every high-severity finding, applies fixes it can make "
@@ -865,7 +872,7 @@ with tab_autofix:
     st.dataframe(pd.DataFrame(fix_rows), use_container_width=True, hide_index=True)
 
 
-with tab_detail:
+if tab_detail:
     st.markdown("### Finding Detail")
 
     id_options = [f"{f['rank']:02d}. [{f['id']}] {f['title'][:70]}" for f in findings]
@@ -940,7 +947,7 @@ with tab_detail:
 # TAB 6 - Backtesting
 # ─────────────────────────────────────────────────────────────────────────────
 
-with tab_backtest:
+if tab_backtest:
     import sys as _sys
     _sys.path.insert(0, SCRIPTS_DIR)
     from backtest import run_backtest

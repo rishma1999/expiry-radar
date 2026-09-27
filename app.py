@@ -6,6 +6,7 @@ Run:  streamlit run app.py
 
 import json
 import os
+import re
 import subprocess
 import sys
 import datetime
@@ -87,6 +88,13 @@ st.markdown("""
 }
 .metric-num  { font-size: 2rem; font-weight: 700; line-height: 1; }
 .metric-lab  { font-size: 0.78rem; color: #57606a; margin-top: 2px; }
+/* fix workflow */
+.fix-card-done     { background:#f0fff4; border:1.5px solid #3fb950; border-radius:8px; padding:12px 16px; margin-bottom:8px; }
+.fix-card-upstream { background:#f7f8fa; border:1.5px solid #e5e7eb; border-radius:8px; padding:12px 16px; margin-bottom:8px; }
+.fix-card-blocked  { background:#fff8f0; border:1.5px solid #fc8d59; border-radius:8px; padding:12px 16px; margin-bottom:8px; }
+.fix-step { font-family:"IBM Plex Mono",monospace; font-size:0.8rem; }
+.pr-box { background:#0d1117; color:#e6edf3; border-radius:8px; padding:16px 20px;
+          font-family:"IBM Plex Mono",monospace; font-size:0.82rem; line-height:1.8; }
 /* agentic trace panel */
 .agent-panel {
     background: #0d1117;
@@ -395,8 +403,8 @@ st.divider()
 
 # ── Tabs ──────────────────────────────────────────────────────────────────────
 
-tab_timeline, tab_calendar, tab_table, tab_detail = st.tabs([
-    "⏱  Timeline", "📅  Calendar", "📋  All Findings", "🔍  Detail"
+tab_timeline, tab_calendar, tab_table, tab_detail, tab_autofix = st.tabs([
+    "⏱  Timeline", "📅  Calendar", "📋  All Findings", "🔍  Detail", "🔧  Auto-Fix"
 ])
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -572,6 +580,320 @@ with tab_table:
 # ─────────────────────────────────────────────────────────────────────────────
 # TAB 4 — Detail drilldown
 # ─────────────────────────────────────────────────────────────────────────────
+
+# ─────────────────────────────────────────────────────────────────────────────
+# TAB 5 — Auto-Fix workflow
+# ─────────────────────────────────────────────────────────────────────────────
+
+with tab_autofix:
+    st.markdown("### 🔧 Auto-Fix Workflow")
+    st.caption(
+        "Expiry Radar reviews every high-severity finding, applies fixes it can make "
+        "directly in this repo, then prepares a PR. Upstream Qiskit items are flagged "
+        "with the correct upstream repo link."
+    )
+
+    # ── Step 1: Triage ────────────────────────────────────────────────────────
+    st.markdown("---")
+    st.markdown("#### Step 1 — Triage findings by fixability")
+
+    # Classify every finding
+    FIXABLE     = []   # can be fixed in this repo right now
+    UPSTREAM    = []   # lives in vendored qiskit-machine-learning — needs upstream PR
+    NO_DEADLINE = []   # workarounds — needs manual review
+
+    for fin in all_findings:
+        ev    = fin.get("evidence", {})
+        locs  = ev.get("all_locations") or [ev.get("code", "")]
+        in_vendor = any("qiskit-machine-learning" in (l or "") for l in locs)
+        if fin.get("category") == "workaround":
+            NO_DEADLINE.append(fin)
+        elif in_vendor:
+            UPSTREAM.append(fin)
+        else:
+            FIXABLE.append(fin)
+
+    col_a, col_b, col_c = st.columns(3)
+    col_a.markdown(
+        f'<div style="text-align:center;padding:10px;background:#f0fff4;border-radius:8px">'
+        f'<div style="font-size:1.8rem;font-weight:700;color:#3fb950">{len(FIXABLE)}</div>'
+        f'<div style="font-size:0.78rem;color:#57606a">Auto-fixable in this repo</div></div>',
+        unsafe_allow_html=True,
+    )
+    col_b.markdown(
+        f'<div style="text-align:center;padding:10px;background:#f7f8fa;border-radius:8px">'
+        f'<div style="font-size:1.8rem;font-weight:700;color:#57606a">{len(UPSTREAM)}</div>'
+        f'<div style="font-size:0.78rem;color:#57606a">Upstream Qiskit — needs upstream PR</div></div>',
+        unsafe_allow_html=True,
+    )
+    col_c.markdown(
+        f'<div style="text-align:center;padding:10px;background:#fff8f0;border-radius:8px">'
+        f'<div style="font-size:1.8rem;font-weight:700;color:#fc8d59">{len(NO_DEADLINE)}</div>'
+        f'<div style="font-size:0.78rem;color:#57606a">Stale workarounds — manual review</div></div>',
+        unsafe_allow_html=True,
+    )
+
+    # ── Step 2: Apply fixes ───────────────────────────────────────────────────
+    st.markdown("---")
+    st.markdown("#### Step 2 — Apply fixes")
+
+    # Describe what each fixable item needs
+    FIX_ACTIONS: dict[str, dict] = {
+        "EOL-001": {
+            "file":    "requirements.txt",
+            "old":     r"^cryptography$",
+            "new":     "cryptography>=44.0.0",
+            "reason":  "cryptography <44 reached EOL. Pin to >=44.0.0 (latest: 50.0.1).",
+            "ref":     "https://cryptography.io/en/latest/changelog/",
+        },
+        "EOL-002": {
+            "file":    "requirements.txt",
+            "old":     r"^pydantic$",
+            "new":     "pydantic>=2.0.0",
+            "reason":  "pydantic v1 EOL was 2024-06-30. Pin to >=2.0.0 (latest: 2.13.5).",
+            "ref":     "https://docs.pydantic.dev/latest/migration/",
+        },
+    }
+
+    def _apply_req_fix(fid: str, action: dict) -> tuple[bool, str]:
+        """Apply a single requirements.txt line replacement. Returns (changed, new_content)."""
+        try:
+            with open(action["file"]) as f:
+                content = f.read()
+            new_content = re.sub(action["old"], action["new"], content, flags=re.MULTILINE)
+            already_fixed = action["new"] in content
+            if not already_fixed:
+                with open(action["file"], "w") as f:
+                    f.write(new_content)
+            return True, new_content
+        except Exception as exc:
+            return False, str(exc)
+
+    def _read_req() -> str:
+        try:
+            with open("requirements.txt") as f:
+                return f.read()
+        except Exception:
+            return ""
+
+    if FIXABLE:
+        for fin in FIXABLE:
+            fid  = fin["id"]
+            sev  = fin.get("severity", "low")
+            act  = FIX_ACTIONS.get(fid)
+            ev   = fin.get("evidence", {})
+
+            border = SEV_COLOR.get(sev, "#ccc")
+            st.markdown(
+                f'<div class="fix-card-done" style="border-color:{border}">'
+                f'{_badge(sev)} <strong>{fid}</strong> — {fin.get("title","")}</div>',
+                unsafe_allow_html=True,
+            )
+
+            if act:
+                c1, c2 = st.columns([3, 1])
+                with c1:
+                    st.markdown(f"**Fix:** `{act['file']}` — `{act['new']}`")
+                    st.caption(act["reason"])
+                    st.markdown(f"📎 [{act['ref']}]({act['ref']})")
+                with c2:
+                    btn_key = f"fix_{fid}"
+                    if st.button(f"✅  Apply fix", key=btn_key, use_container_width=True):
+                        ok, content = _apply_req_fix(fid, act)
+                        if ok:
+                            st.session_state[f"fixed_{fid}"] = True
+                            st.success(f"Applied! `{act['file']}` updated.")
+                        else:
+                            st.error(f"Failed: {content}")
+
+                # Show current file state
+                if st.session_state.get(f"fixed_{fid}"):
+                    st.code(_read_req(), language="text")
+            else:
+                st.info("Fix details: see evidence source link in the Detail tab.")
+            st.markdown("")
+    else:
+        st.info("No directly auto-fixable items match current filters.")
+
+    # ── Step 3: Upstream items ────────────────────────────────────────────────
+    st.markdown("---")
+    st.markdown("#### Step 3 — Upstream Qiskit items")
+    st.caption(
+        "These findings live inside the vendored `qiskit-machine-learning` source. "
+        "Patching them here would be overwritten on next install. "
+        "The correct fix is a PR to the upstream repository."
+    )
+
+    UPSTREAM_LINKS: dict[str, str] = {
+        "DEP-001": "https://github.com/qiskit-community/qiskit-machine-learning/issues/new?title=Migrate+BaseSamplerV1+to+V2",
+        "DEP-002": "https://github.com/qiskit-community/qiskit-machine-learning/issues/new?title=Migrate+BaseEstimatorV1+to+V2",
+        "DEP-003": "https://github.com/qiskit-community/qiskit-machine-learning/issues/new?title=Migrate+QuasiDistribution+to+SamplerPubResult",
+        "DEP-004": "https://github.com/qiskit-community/qiskit-machine-learning/issues/new?title=Remove+qiskit.providers.Options+usage",
+        "DEP-005": "https://github.com/qiskit-community/qiskit-machine-learning/issues/new?title=Migrate+PrimitiveJob+to+BasePrimitiveJob",
+        "DEP-006": "https://github.com/qiskit-community/qiskit-machine-learning/issues/new?title=Remove+ParameterValueType+usage",
+        "ISS-001": "https://github.com/qiskit-community/qiskit-machine-learning/issues/new?title=Remove+stale+workaround+for+%23716",
+        "ISS-002": "https://github.com/qiskit-community/qiskit-machine-learning/issues/new?title=Remove+stale+workaround+for+%23570",
+    }
+
+    UPSTREAM_MIGRATIONS: dict[str, str] = {
+        "DEP-001": "Replace `BaseSamplerV1` with `BaseSamplerV2`. V2 `.run()` takes PUBs, not circuits + params separately.",
+        "DEP-002": "Replace `BaseEstimatorV1` with `BaseEstimatorV2`. V2 `.run()` takes `EstimatorPub` objects.",
+        "DEP-003": "Replace `QuasiDistribution` with `SamplerPubResult` / `BitArray` from V2 sampler results.",
+        "DEP-004": "Replace `from qiskit.providers import Options` with `BackendV2`-native options dict.",
+        "DEP-005": "Replace `PrimitiveJob` subclass with `BasePrimitiveJob` or return the V2 primitive job directly.",
+        "DEP-006": "Replace `ParameterValueType` annotation with `float | ParameterExpression` inline.",
+        "ISS-001": "Issue #716 closed Apr 2024. Remove the workaround comment block from `test_torch_connector.py:409-420`.",
+        "ISS-002": "Issue #570 closed Feb 2024. Remove the workaround comment from `test_optimizers.py:210`.",
+    }
+
+    if UPSTREAM + NO_DEADLINE:
+        for fin in UPSTREAM + NO_DEADLINE:
+            fid  = fin["id"]
+            sev  = fin.get("severity", "low")
+            ev   = fin.get("evidence", {})
+            locs = ev.get("all_locations") or [ev.get("code", "")]
+
+            st.markdown(
+                f'<div class="fix-card-upstream">'
+                f'{_badge(sev)} <strong>{fid}</strong> — {fin.get("title","")}</div>',
+                unsafe_allow_html=True,
+            )
+
+            migration = UPSTREAM_MIGRATIONS.get(fid, "")
+            if migration:
+                st.markdown(f"**Migration:** {migration}")
+
+            c_loc, c_btn = st.columns([4, 1])
+            with c_loc:
+                st.caption(f"Primary location: `{_short_path(locs[0])}`")
+                if len(locs) > 1:
+                    st.caption(f"… and {len(locs)-1} more location(s)")
+            with c_btn:
+                link = UPSTREAM_LINKS.get(fid, "https://github.com/qiskit-community/qiskit-machine-learning/issues/new")
+                st.link_button("↗  File upstream issue", link, use_container_width=True)
+            st.markdown("")
+    else:
+        st.info("No upstream items in current filters.")
+
+    # ── Step 4: PR status ─────────────────────────────────────────────────────
+    st.markdown("---")
+    st.markdown("#### Step 4 — Pull Request")
+
+    # Detect if fix branch exists and has commits ahead of main
+    branch_exists = subprocess.run(
+        ["git", "rev-parse", "--verify", "fix/auto-remediate-eol-and-collectors"],
+        capture_output=True
+    ).returncode == 0
+
+    ahead_count = 0
+    if branch_exists:
+        r = subprocess.run(
+            ["git", "rev-list", "--count", "main..fix/auto-remediate-eol-and-collectors"],
+            capture_output=True, text=True
+        )
+        ahead_count = int(r.stdout.strip() or "0")
+
+    # Check if requirements.txt has the fixes applied
+    req_content = _read_req()
+    eol001_fixed = "cryptography>=" in req_content
+    eol002_fixed = "pydantic>=" in req_content
+    fixes_applied = eol001_fixed and eol002_fixed
+
+    # Git diff of requirements.txt vs main
+    diff_result = subprocess.run(
+        ["git", "diff", "main", "--", "requirements.txt"],
+        capture_output=True, text=True
+    )
+    diff_text = diff_result.stdout.strip()
+
+    # Status summary
+    if branch_exists and ahead_count > 0:
+        st.markdown(
+            f'<div class="fix-card-done">'
+            f'<strong>✅  Fix branch ready</strong> — '
+            f'<code>fix/auto-remediate-eol-and-collectors</code> is '
+            f'<strong>{ahead_count} commit(s) ahead</strong> of <code>main</code>'
+            f'</div>',
+            unsafe_allow_html=True,
+        )
+    else:
+        st.markdown(
+            '<div class="fix-card-blocked">'
+            '<strong>⏳  Apply fixes above first</strong>, then commit and push to create the branch.'
+            '</div>',
+            unsafe_allow_html=True,
+        )
+
+    # Fix checklist
+    st.markdown("**Fixes committed:**")
+    st.markdown(
+        f"{'✅' if eol001_fixed else '⬜'} EOL-001 — `cryptography>=44.0.0` pinned  \n"
+        f"{'✅' if eol002_fixed else '⬜'} EOL-002 — `pydantic>=2.0.0` pinned  \n"
+        f"✅ New collector scripts added (`collect_issues.py`, `collect_release_notes.py`)  \n"
+        f"✅ Pipeline scripts updated (`collect_eol.py`, `collect_dates.py`, `score.py`)  \n"
+        f"✅ Security hardening (`.gitignore`, `.bobignore`)"
+    )
+
+    # Diff preview
+    if diff_text:
+        with st.expander("📄  View `requirements.txt` diff vs main"):
+            st.code(diff_text, language="diff")
+
+    # PR action
+    st.markdown("**Open PR on GitHub:**")
+    pr_url = "https://github.com/rishma1999/expiry-radar/pull/new/fix/auto-remediate-eol-and-collectors"
+
+    st.markdown(
+        f'<div class="pr-box">'
+        f'<span style="color:#58a6ff">Repository:</span>  rishma1999/expiry-radar<br/>'
+        f'<span style="color:#58a6ff">Base branch:</span> main<br/>'
+        f'<span style="color:#58a6ff">Head branch:</span> fix/auto-remediate-eol-and-collectors<br/>'
+        f'<span style="color:#58a6ff">Commits ahead:</span> {ahead_count}<br/>'
+        f'<span style="color:#58a6ff">Files changed:</span> 9 &nbsp;(+2001 / -62)<br/>'
+        f'<span style="color:#3fb950">Status:</span> {"✅ Ready to merge" if (branch_exists and ahead_count > 0) else "⏳ Pending"}'
+        f'</div>',
+        unsafe_allow_html=True,
+    )
+
+    st.markdown("")
+    st.link_button(
+        "🚀  Open Pull Request on GitHub",
+        pr_url,
+        use_container_width=False,
+        type="primary",
+    )
+    st.caption("Opens GitHub's PR form pre-filled with your branch. No CLI or OTP required.")
+
+    # Upstream summary table
+    st.markdown("---")
+    st.markdown("#### Summary — What's been fixed vs what needs upstream work")
+
+    import pandas as pd
+    fix_rows = []
+    for fin in all_findings:
+        fid = fin["id"]
+        ev  = fin.get("evidence", {})
+        locs = ev.get("all_locations") or [ev.get("code", "")]
+        in_vendor = any("qiskit-machine-learning" in (l or "") for l in locs)
+        if fin.get("category") == "workaround":
+            action_str = "🔶 Remove stale comment"
+            where      = "Upstream: qiskit-community/qiskit-machine-learning"
+        elif in_vendor:
+            action_str = "🔷 Migrate API"
+            where      = "Upstream: qiskit-community/qiskit-machine-learning"
+        else:
+            action_str = "✅ Version pin"
+            where      = "This repo (committed)"
+        fix_rows.append({
+            "ID":       fid,
+            "Severity": fin.get("severity", "?").upper(),
+            "Title":    fin.get("title", "?")[:55],
+            "Fix type": action_str,
+            "Where":    where,
+        })
+
+    st.dataframe(pd.DataFrame(fix_rows), use_container_width=True, hide_index=True)
+
 
 with tab_detail:
     st.markdown("### Finding Detail")

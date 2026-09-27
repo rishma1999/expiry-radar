@@ -299,7 +299,7 @@ with st.sidebar:
         unsafe_allow_html=True,
     )
     st.markdown("## 📡 Expiry Radar")
-    st.caption("IBM Bob 2.0 Hackathon · Team Project")
+    st.caption("IBM Bob 2.0 Hackathon · BOB Works Team Project")
     st.divider()
 
     st.markdown("### Filters")

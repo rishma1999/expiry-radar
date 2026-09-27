@@ -1,15 +1,7 @@
-# Expiry Radar — pinned to safe, non-EOL versions
-# EOL-001 fix: cryptography <44.0 reached EOL 2026-10-01; pin to >=44.0.0
-cryptography>=44.0.0
-# EOL-002 fix: pydantic v1 reached EOL 2024-06-30; pin to v2 series
-pydantic>=2.0.0
-# HTTP client used by collect_issues.py and collect_release_notes.py (stdlib urllib used, requests kept for app)
 requests
-# Version parsing used by collect_eol.py
 packaging
-# BM25 retrieval for release-notes RAG ranking (future use)
+cryptography
 rank_bm25
-# Dashboard
+pydantic
 streamlit
-# Data table rendering in app.py
 pandas

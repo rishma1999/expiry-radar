@@ -290,7 +290,7 @@ def run_pipeline_streaming(trace_slot, log_slot) -> bool:
 with st.sidebar:
     st.image(
         "https://upload.wikimedia.org/wikipedia/commons/5/51/IBM_logo.svg",
-        use_container_width=True,
+        width=120,
     )
     st.markdown("## 📡 Expiry Radar")
     st.caption("IBM Bob 2.0 Hackathon · Team Project")

@@ -28,4 +28,4 @@ Watch all 5 subagents fire in sequence:
 | 🤖 **Release Notes RAG** | Fetches 15 latest Qiskit releases, parses `Deprecated`/`Removed` sections, matches against codebase | `deprecation_findings.json` |
 | 🤖 **Urgency Scorer** | Merges all sources, scores by `(1/days_left) × severity × confidence`, ranks all findings | `scored_findings.json` |
 
-At the end the script prints the top 3 most urgent findings
+At the end the script prints the top 3 most urgent findings.

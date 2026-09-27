@@ -1,11 +1,86 @@
-# Prevent Bob from reading, modifying, or exposing credentials
+# =============================================================================
+# .bobignore — Expiry Radar
+# Prevents Bob from reading, modifying, suggesting, or surfacing the content
+# of files that contain or could contain sensitive credentials.
+# =============================================================================
+
+# ── IBM Cloud & Watson credentials ───────────────────────────────────────────
+ibm-credentials.env
+ibmcloud-*.json
+ibm-cloud-api-key.txt
+service_credentials*.json
+vcap-services*.json
+apikey.txt
+api_key.txt
+.ibmcloud/
+
+# ── Generic secrets & environment files ──────────────────────────────────────
 .env
 .env.local
-.env.*
+.env.*.local
+.env.development
+.env.test
+.env.production
+.env.staging
+*.env
+
+# ── Key files & certificates ─────────────────────────────────────────────────
 *.pem
 *.key
-credentials.json
-ibm-cloud-api-key.txt
+*.p12
+*.pfx
+*.jks
+*.cer
+*.crt
+*.csr
+id_rsa
+id_rsa.*
+id_ed25519
+id_ed25519.*
+id_dsa
+id_dsa.*
+*.ppk
+secrets.yaml
+secrets.yml
+secrets.json
+*secrets*
+*secret*
+*credential*
 
-# Ignore nested git repos
+# ── GitHub / CI tokens ───────────────────────────────────────────────────────
+.github-token
+github_token.txt
+GITHUB_TOKEN
+
+# ── Auth & config files that may embed tokens ────────────────────────────────
+.netrc
+.curlrc
+.npmrc
+.pypirc
+.docker/config.json
+config/database.yml
+database.yml
+
+# ── Expiry Radar — pipeline output files ─────────────────────────────────────
+# These contain local absolute paths and GitHub API responses.
+# Bob should not read or include their content in context.
+candidates.json
+eol_candidates.json
+eol_findings.json
+deprecation_findings.json
+issue_candidates.json
+issue_findings.json
+todo_findings.json
+todo_analysis.json
+scored_findings.json
+findings.json
+
+# ── Nested git repos & internal tooling ──────────────────────────────────────
 .git/
+qiskit-machine-learning-main/
+qiskit-machine-learning/
+qiskit.zip
+
+# ── Python cache ─────────────────────────────────────────────────────────────
+__pycache__/
+*.py[cod]

@@ -1,5 +1,5 @@
 # =============================================================================
-# .bobignore — Expiry Radar
+# .bobignore - Expiry Radar
 # Prevents Bob from reading, modifying, suggesting, or surfacing the content
 # of files that contain or could contain sensitive credentials.
 # =============================================================================
@@ -61,7 +61,7 @@ GITHUB_TOKEN
 config/database.yml
 database.yml
 
-# ── Expiry Radar — pipeline output files ─────────────────────────────────────
+# ── Expiry Radar - pipeline output files ─────────────────────────────────────
 # These contain local absolute paths and GitHub API responses.
 # Bob should not read or include their content in context.
 candidates.json

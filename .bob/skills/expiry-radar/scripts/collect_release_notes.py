@@ -1,20 +1,20 @@
 """
-collect_release_notes.py — Expiry Radar · Qiskit Release Notes RAG
+collect_release_notes.py - Expiry Radar · Qiskit Release Notes RAG
 --------------------------------------------------------------------
 Acts as a lightweight retrieval-augmented generator (RAG) for Qiskit
 deprecation intelligence:
 
-  1. FETCH   — pulls the latest Qiskit GitHub release bodies (up to N pages)
+  1. FETCH   - pulls the latest Qiskit GitHub release bodies (up to N pages)
                to extract Deprecated / Removed sections.
-  2. CATALOG — merges fetched deprecations with an authoritative hardcoded
+  2. CATALOG - merges fetched deprecations with an authoritative hardcoded
                catalog of high-impact deprecations confirmed from Qiskit 2.x
                migration guides and release notes.
-  3. SCAN    — greps the local codebase for every deprecated symbol.
-  4. SCORE   — assigns severity using severity-guide.md rules (days to removal).
-  5. EMIT    — writes deprecation_findings.json conforming to finding-schema.json.
+  3. SCAN    - greps the local codebase for every deprecated symbol.
+  4. SCORE   - assigns severity using severity-guide.md rules (days to removal).
+  5. EMIT    - writes deprecation_findings.json conforming to finding-schema.json.
 
 Environment variable:
-    GITHUB_TOKEN — optional; avoids the 60 req/hr unauthenticated API limit.
+    GITHUB_TOKEN - optional; avoids the 60 req/hr unauthenticated API limit.
 
 Usage:
     python collect_release_notes.py [--root PATH] [--releases N]
@@ -34,7 +34,7 @@ from pathlib import Path
 # Authoritative deprecation catalog
 # Built from:
 #   • Qiskit 2.0 release notes  (removals of 1.x deprecations)
-#   • Qiskit 2.2 release notes  (#14511 — legacy circuit library)
+#   • Qiskit 2.2 release notes  (#14511 - legacy circuit library)
 #   • Qiskit 2.3 release notes  (#15356, #15360)
 #   • Qiskit migration guide    https://docs.quantum.ibm.com/migration-guides/qiskit-2.0
 #   • Qiskit 1.x deprecation warnings in stable/2.5 source
@@ -246,7 +246,7 @@ def _severity(days: int) -> str:
 
 
 # ---------------------------------------------------------------------------
-# Step 1 — fetch release notes from GitHub
+# Step 1 - fetch release notes from GitHub
 # ---------------------------------------------------------------------------
 
 def _github_headers() -> dict:
@@ -312,7 +312,7 @@ def extract_deprecations_from_releases(releases: list[dict]) -> list[dict]:
 
 
 # ---------------------------------------------------------------------------
-# Step 2 — scan codebase for deprecated symbols
+# Step 2 - scan codebase for deprecated symbols
 # ---------------------------------------------------------------------------
 
 def _build_search_pattern(symbol: str) -> re.Pattern:
@@ -360,7 +360,7 @@ def scan_codebase(root: Path, symbols: list[str]) -> dict[str, list[dict]]:
 
 
 # ---------------------------------------------------------------------------
-# Step 3 — build findings
+# Step 3 - build findings
 # ---------------------------------------------------------------------------
 
 def build_findings(

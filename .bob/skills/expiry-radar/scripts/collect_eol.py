@@ -1,5 +1,5 @@
 """
-collect_eol.py — Expiry Radar EOL collector
+collect_eol.py - Expiry Radar EOL collector
 --------------------------------------------
 1. Reads requirements.txt and writes eol_candidates.json  (unchanged contract).
 2. For every candidate, tries endoflife.date API for real EOL date.
@@ -36,7 +36,7 @@ HARDCODED_EOL: dict[str, dict] = {
         "latest": "1.4.2",
         "link": "https://github.com/Qiskit/qiskit/blob/main/DEPRECATIONS.md",
     },
-    # Qiskit IBM Runtime — current supported release schedule
+    # Qiskit IBM Runtime - current supported release schedule
     "qiskit-ibm-runtime": {
         "eol": "2026-01-01",
         "latest": "0.30.0",
@@ -117,7 +117,7 @@ def _best_cycle(cycles: list[dict], pinned_version: str | None) -> dict | None:
             if cycle_name == major_minor or cycle_name.startswith(major_minor + "."):
                 return cycle
 
-    # Fallback: latest cycle (first entry) — endoflife.date lists newest first
+    # Fallback: latest cycle (first entry) - endoflife.date lists newest first
     return cycles[0]
 
 
@@ -161,7 +161,7 @@ def _make_finding(pkg_name: str, version: str | None, source: str,
 
 
 # ---------------------------------------------------------------------------
-# Step 1 — collect candidates (unchanged contract with the rest of the pipeline)
+# Step 1 - collect candidates (unchanged contract with the rest of the pipeline)
 # ---------------------------------------------------------------------------
 def collect_candidates(req_file: str = "requirements.txt") -> list[dict]:
     deps = []
@@ -172,12 +172,12 @@ def collect_candidates(req_file: str = "requirements.txt") -> list[dict]:
                 if line and not line.startswith("#"):
                     deps.append({"dependency": line, "source": req_file})
     except FileNotFoundError:
-        print(f"[collect_eol] {req_file} not found — skipping.", file=sys.stderr)
+        print(f"[collect_eol] {req_file} not found - skipping.", file=sys.stderr)
     return deps
 
 
 # ---------------------------------------------------------------------------
-# Step 2 — enrich with EOL dates
+# Step 2 - enrich with EOL dates
 # ---------------------------------------------------------------------------
 def enrich(candidates: list[dict]) -> list[dict]:
     findings: list[dict] = []
@@ -219,7 +219,7 @@ def enrich(candidates: list[dict]) -> list[dict]:
 
         # -- Layer 3: skip if no EOL date could be determined -----------
         if eol_date is None:
-            print(f"[collect_eol] No EOL data for '{pkg_name}' — skipping.")
+            print(f"[collect_eol] No EOL data for '{pkg_name}' - skipping.")
             continue
 
         findings.append(
@@ -234,13 +234,13 @@ def enrich(candidates: list[dict]) -> list[dict]:
 # Main
 # ---------------------------------------------------------------------------
 def main() -> None:
-    # Phase 1 — produce eol_candidates.json (unchanged downstream contract)
+    # Phase 1 - produce eol_candidates.json (unchanged downstream contract)
     candidates = collect_candidates()
     with open("eol_candidates.json", "w") as f:
         json.dump(candidates, f, indent=2)
     print(f"[collect_eol] Found {len(candidates)} dependencies to check.")
 
-    # Phase 2 — enrich and emit eol_findings.json
+    # Phase 2 - enrich and emit eol_findings.json
     print("[collect_eol] Querying endoflife.date API + hardcoded fallback map …")
     findings = enrich(candidates)
 

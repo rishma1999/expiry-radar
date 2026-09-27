@@ -433,7 +433,7 @@ def _options_to_dict(opts) -> dict:
         opts: Any options-like object.
 
     Returns:
-        dict: Extracted key–value pairs.
+        dict: Extracted key-value pairs.
     """
     if opts is None:
         return {}
@@ -460,7 +460,7 @@ class _OptionsNS(SimpleNamespace):
         """Update options in place.
 
         Args:
-            **kwargs: Key–value pairs to update.
+            **kwargs: Key-value pairs to update.
         """
         for k, v in kwargs.items():
             setattr(self, k, v)

@@ -249,7 +249,7 @@ def _assign_parameters(
     expected = 3 * depth * n_qubits
     if len(weights) != expected:
         raise ValueError(
-            """Parameter mismatch – please reinstall the latest 'qiskit-machine-learning'
+            """Parameter mismatch - please reinstall the latest 'qiskit-machine-learning'
             package (or update the model files).""",
         )
 
@@ -288,7 +288,7 @@ def _cardinal(n_qubits: int, n_points: int) -> np.ndarray:
     and takes Kronecker product of those to create the input states
 
     Each product state is built from the six axis states
-        |0>, |1>, |+>, |–>, |i>, |–i>
+        |0>, |1>, |+>, |->, |i>, |-i>
     chosen independently and uniformly for every qubit."""
 
     sqrt2 = np.sqrt(2.0)
@@ -298,9 +298,9 @@ def _cardinal(n_qubits: int, n_points: int) -> np.ndarray:
                 [1.0, 0.0],  # |0>
                 [0.0, 1.0],  # |1>
                 [1.0, 1.0],  # |+>
-                [1.0, -1.0],  # |–>
+                [1.0, -1.0],  # |->
                 [1.0, 1.0j],  # |i>
-                [1.0, -1.0j],  # |–i>
+                [1.0, -1.0j],  # |-i>
             ],
             dtype=np.complex128,
         )

@@ -40,8 +40,8 @@ def build_hamiltonian(n: int, j1: float, j2: float) -> SparsePauliOp:
 
     Phase diagram (thermodynamic limit):
 
-    * **trivial** — :math:`J_2 / J_1 < 1`
-    * **topological** — :math:`J_2 / J_1 > 1`
+    * **trivial** - :math:`J_2 / J_1 < 1`
+    * **topological** - :math:`J_2 / J_1 > 1`
 
     Args:
         n: Number of lattice sites (qubits).
@@ -77,7 +77,7 @@ def sample_parameters(n_samples: int, rng: np.random.Generator) -> list[tuple[di
         *n_samples* entries for each phase in :data:`PHASE_LABELS`, in order.
     """
     samples: list[tuple[dict, str]] = []
-    # trivial: J2/J1 ∈ (0.0, 0.8)  —  fix J1 = 1.0
+    # trivial: J2/J1 ∈ (0.0, 0.8)  -  fix J1 = 1.0
     ratios = rng.uniform(0.0, 0.8, size=n_samples)
     for r in ratios:
         samples.append(({"j1": 1.0, "j2": float(r)}, "trivial"))

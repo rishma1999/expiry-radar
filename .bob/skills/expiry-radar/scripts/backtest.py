@@ -1,13 +1,13 @@
 """
-backtest.py — Expiry Radar · Historical Backtester
+backtest.py - Expiry Radar · Historical Backtester
 ----------------------------------------------------
 Simulates what Expiry Radar WOULD have predicted if it had been run against
 the qiskit-machine-learning 0.6.0 codebase (released March 2023) and
 measures how accurately it predicted the real breakages that shipped in
-0.7.0 (November 2023) — 8 months later.
+0.7.0 (November 2023) - 8 months later.
 
 Ground truth source:
-  - Deprecations announced in 0.5.0 / 0.6.0 release notes (Nov 2022 – Mar 2023)
+  - Deprecations announced in 0.5.0 / 0.6.0 release notes (Nov 2022 - Mar 2023)
   - Actual removals confirmed in 0.7.0 release notes (Nov 2023)
   - GitHub releases API: https://github.com/qiskit-community/qiskit-machine-learning
 
@@ -21,7 +21,7 @@ import json
 import sys
 
 # ---------------------------------------------------------------------------
-# Ground truth: what was ACTUALLY deprecated in 0.5.0–0.6.0 (our "past state")
+# Ground truth: what was ACTUALLY deprecated in 0.5.0-0.6.0 (our "past state")
 # These are the symbols a 2023-era codebase would have been using.
 # Source: https://github.com/qiskit-community/qiskit-machine-learning/releases
 # ---------------------------------------------------------------------------
@@ -106,7 +106,7 @@ DEPRECATED_IN_0_5_0_0_6_0 = [
         "replacement":   "assign_training_parameters",
         "category":      "deprecation",
     },
-    # V1 primitives — deprecated in 0.8.0, flaggable from 0.6 usage patterns
+    # V1 primitives - deprecated in 0.8.0, flaggable from 0.6 usage patterns
     {
         "symbol":        "BaseSamplerV1",
         "deprecated_in": "qiskit-1.2",

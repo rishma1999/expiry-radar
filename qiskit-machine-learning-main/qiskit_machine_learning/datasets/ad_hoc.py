@@ -89,7 +89,7 @@ def ad_hoc_data(
 
     [1] Havlíček V, Córcoles AD, Temme K, Harrow AW, Kandala A, Chow JM,
     Gambetta JM. *Supervised learning with quantum-enhanced feature spaces*.
-    Nature. 2019 Mar;567(7747):209–212.
+    Nature. 2019 Mar;567(7747):209-212.
     `arXiv:1804.11326 <https://arxiv.org/abs/1804.11326>`_
 
     Parameters:

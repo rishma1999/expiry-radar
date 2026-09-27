@@ -41,10 +41,10 @@ def build_hamiltonian(n: int, j1: float, j2: float) -> SparsePauliOp:
     Phase diagram (see Fig. 6 in the reference, axes :math:`J_1` vs
     :math:`J_2`):
 
-    * **haldane** (I) — large positive :math:`J_1`, large negative :math:`J_2`
-    * **ferromagnetic** (II) — large positive :math:`J_1` and :math:`J_2`
-    * **antiferromagnetic** (III) — large negative :math:`J_1` and :math:`J_2`
-    * **trivial** (IV) — both :math:`|J_1|` and :math:`|J_2|` small
+    * **haldane** (I) - large positive :math:`J_1`, large negative :math:`J_2`
+    * **ferromagnetic** (II) - large positive :math:`J_1` and :math:`J_2`
+    * **antiferromagnetic** (III) - large negative :math:`J_1` and :math:`J_2`
+    * **trivial** (IV) - both :math:`|J_1|` and :math:`|J_2|` small
 
     Args:
         n: Number of lattice sites (qubits).

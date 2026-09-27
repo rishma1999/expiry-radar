@@ -22,7 +22,7 @@ from . import _annni, _cluster, _haldane, _heisenberg
 from ._base import get_ground_state_exact, get_ground_state_vqe
 
 # ---------------------------------------------------------------------------
-# Registry — maps model name to its module
+# Registry - maps model name to its module
 # ---------------------------------------------------------------------------
 
 _MODELS = {
@@ -88,13 +88,13 @@ def phase_of_matter_data(
     Four spin-chain Hamiltonians are supported (see the reference for the
     exact definitions and phase diagrams):
 
-    * ``"heisenberg"`` — Bond-alternating XXX Heisenberg model (eq. 6).
+    * ``"heisenberg"`` - Bond-alternating XXX Heisenberg model (eq. 6).
       Phases: *trivial*, *topological*.
-    * ``"haldane"`` — Haldane chain (eq. 7).
+    * ``"haldane"`` - Haldane chain (eq. 7).
       Phases: *antiferromagnetic*, *paramagnetic*, *spt*.
-    * ``"annni"`` — Axial Next-Nearest-Neighbor Ising model (eq. 8).
+    * ``"annni"`` - Axial Next-Nearest-Neighbor Ising model (eq. 8).
       Phases: *ferromagnetic*, *paramagnetic*, *floating*, *antiphase*.
-    * ``"cluster"`` — Cluster Hamiltonian with periodic boundary (eq. 9).
+    * ``"cluster"`` - Cluster Hamiltonian with periodic boundary (eq. 9).
       Phases: *haldane*, *ferromagnetic*, *antiferromagnetic*, *trivial*.
 
     Args:
@@ -141,17 +141,17 @@ def phase_of_matter_data(
         A tuple ``(training_features, training_labels, test_features,
         test_labels)`` where:
 
-        * ``training_features`` / ``test_features`` — shape
+        * ``training_features`` / ``test_features`` - shape
           ``(n_samples, 2**n)`` complex ndarray, or list of
           :class:`~qiskit.quantum_info.Statevector` when
           ``formatting="statevector"``.
-        * ``training_labels`` / ``test_labels`` — shape
+        * ``training_labels`` / ``test_labels`` - shape
           ``(n_samples, n_classes)`` one-hot ndarray when ``one_hot=True``,
           or list of strings when ``one_hot=False``.
 
-        If ``include_sample_total=True``, a fifth element — a numpy array of
+        If ``include_sample_total=True``, a fifth element - a numpy array of
         shape ``(n_classes,)`` containing the number of ground states
-        computed per class — is appended.
+        computed per class - is appended.
 
     Raises:
         ValueError: If *model* is not one of the supported strings.
@@ -213,7 +213,7 @@ def phase_of_matter_data(
         else get_ground_state_exact
     )
 
-    # Compute ground states — preserve class-block order for the split below.
+    # Compute ground states - preserve class-block order for the split below.
     all_states: list[np.ndarray] = []
     all_labels: list[str] = []
     for params, phase in raw_samples:

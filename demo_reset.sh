@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # =============================================================================
-# demo_reset.sh — Expiry Radar · Pre-demo reset
+# demo_reset.sh - Expiry Radar · Pre-demo reset
 # =============================================================================
 # Run ONCE before every demo. Wipes all generated artifacts and resets
 # requirements.txt to the unpinned state so the pipeline produces real
@@ -19,11 +19,11 @@ warn()   { echo "  ${YELLOW}⚠${RESET}  $1"; }
 
 echo ""
 echo "${BOLD}${CYAN}╔══════════════════════════════════════════════════╗${RESET}"
-echo "${BOLD}${CYAN}║   📡  Expiry Radar — Pre-Demo Reset              ║${RESET}"
+echo "${BOLD}${CYAN}║   📡  Expiry Radar - Pre-Demo Reset              ║${RESET}"
 echo "${BOLD}${CYAN}╚══════════════════════════════════════════════════╝${RESET}"
 
 # ── 1. Confirm we are on main ──────────────────────────────────────────────────
-banner "Step 1 / 5 — Git state"
+banner "Step 1 / 5 - Git state"
 CURRENT_BRANCH=$(git branch --show-current)
 if [ "$CURRENT_BRANCH" != "main" ]; then
   echo "  ${YELLOW}Currently on branch '${CURRENT_BRANCH}'. Switching to main...${RESET}"
@@ -39,7 +39,7 @@ for branch in $(git branch | grep "fix/" | tr -d ' '); do
 done
 
 # ── 2. Remove all generated pipeline artifacts ─────────────────────────────────
-banner "Step 2 / 5 — Clear pipeline artifacts"
+banner "Step 2 / 5 - Clear pipeline artifacts"
 ARTIFACTS=(
   candidates.json
   eol_candidates.json
@@ -59,7 +59,7 @@ done
 ok "Removed $removed artifact(s). Working directory is clean."
 
 # ── 3. Reset requirements.txt to unpinned (shows real EOL findings in demo) ───
-banner "Step 3 / 5 — Reset requirements.txt to unfixed state"
+banner "Step 3 / 5 - Reset requirements.txt to unfixed state"
 cat > requirements.txt << 'REQEOF'
 requests
 packaging
@@ -69,10 +69,10 @@ pydantic
 streamlit
 pandas
 REQEOF
-ok "requirements.txt reset (unpinned — EOL findings will appear in the pipeline)."
+ok "requirements.txt reset (unpinned - EOL findings will appear in the pipeline)."
 
 # ── 4. Verify Python dependencies ─────────────────────────────────────────────
-banner "Step 4 / 5 — Verify dependencies"
+banner "Step 4 / 5 - Verify dependencies"
 if python3 -c "import streamlit, pandas, packaging, requests, rank_bm25" 2>/dev/null; then
   ok "All required packages importable."
 else
@@ -80,7 +80,7 @@ else
 fi
 
 # ── 5. Verify collectors ──────────────────────────────────────────────────────
-banner "Step 5 / 5 — Verify collector scripts"
+banner "Step 5 / 5 - Verify collector scripts"
 SCRIPTS=".bob/skills/expiry-radar/scripts"
 ALL_OK=true
 for script in collect_eol.py collect_dates.py collect_issues.py collect_release_notes.py score.py; do
@@ -97,15 +97,15 @@ echo ""
 if $ALL_OK; then
   echo "${BOLD}${GREEN}✅  Reset complete. You are ready for the demo.${RESET}"
 else
-  echo "${BOLD}${YELLOW}⚠   Reset complete with warnings — check missing files above.${RESET}"
+  echo "${BOLD}${YELLOW}⚠   Reset complete with warnings - check missing files above.${RESET}"
 fi
 echo ""
 echo "  Next step:"
 echo ""
-echo "  ${BOLD}Option A — Run full pipeline in terminal (then open Streamlit):${RESET}"
+echo "  ${BOLD}Option A - Run full pipeline in terminal (then open Streamlit):${RESET}"
 echo "    bash demo_run.sh"
 echo ""
-echo "  ${BOLD}Option B — Jump straight to the Streamlit app:${RESET}"
+echo "  ${BOLD}Option B - Jump straight to the Streamlit app:${RESET}"
 echo "    1. Open your Streamlit Cloud app URL"
 echo "    2. Click  🔄 Run All Collectors  in the sidebar"
 echo "    3. Walk through the 6 tabs"

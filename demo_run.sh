@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 # =============================================================================
-# demo_run.sh — Expiry Radar · Live demo pipeline runner
+# demo_run.sh - Expiry Radar · Live demo pipeline runner
 # =============================================================================
 # Runs all 5 agents in sequence with visible output, then opens the
-# Streamlit Cloud app in the browser — no localhost ever started.
+# Streamlit Cloud app in the browser - no localhost ever started.
 #
 # Prerequisites:
 #   1. Run `bash demo_reset.sh` first (cleans artifacts + resets requirements.txt)
@@ -47,7 +47,7 @@ pause()  { sleep "${1:-1}"; }
 # =============================================================================
 echo ""
 echo "${BOLD}${CYAN}╔══════════════════════════════════════════════════════════════╗${RESET}"
-echo "${BOLD}${CYAN}║   📡  Expiry Radar — IBM Bob 2.0 Hackathon Demo              ║${RESET}"
+echo "${BOLD}${CYAN}║   📡  Expiry Radar - IBM Bob 2.0 Hackathon Demo              ║${RESET}"
 echo "${BOLD}${CYAN}║   'Everything has a hidden expiration date. We find it.'     ║${RESET}"
 echo "${BOLD}${CYAN}╚══════════════════════════════════════════════════════════════╝${RESET}"
 pause 2
@@ -64,7 +64,7 @@ if [ -f "scored_findings.json" ]; then
 fi
 
 # ── AGENT 1: EOL Collector ────────────────────────────────────────────────────
-banner "🤖 Agent 1 / 5 — EOL Collector"
+banner "🤖 Agent 1 / 5 - EOL Collector"
 step  "Reads requirements.txt"
 step  "Queries endoflife.date API + IBM/Qiskit hardcoded fallback map"
 step  "Emits eol_candidates.json + eol_findings.json"
@@ -74,7 +74,7 @@ tick  "eol_findings.json written"
 pause 1
 
 # ── AGENT 2: Date & TODO Scanner ─────────────────────────────────────────────
-banner "🤖 Agent 2 / 5 — Date & TODO Scanner"
+banner "🤖 Agent 2 / 5 - Date & TODO Scanner"
 step  "Scans all .py and .md files for hardcoded ISO dates"
 step  "Matches only comment-anchored TODOs (filters author names + prose)"
 step  "Emits candidates.json"
@@ -84,9 +84,9 @@ tick  "candidates.json written"
 pause 1
 
 # ── AGENT 3: GitHub Issues Agent ─────────────────────────────────────────────
-banner "🤖 Agent 3 / 5 — GitHub Issues Agent"
+banner "🤖 Agent 3 / 5 - GitHub Issues Agent"
 step  "Scans codebase for GitHub issue URLs"
-step  "Calls GitHub REST API — checks current state (open / closed)"
+step  "Calls GitHub REST API - checks current state (open / closed)"
 step  "Flags CLOSED issues where workaround comment is still in code"
 step  "Emits issue_candidates.json + issue_findings.json"
 pause 1
@@ -95,18 +95,18 @@ tick  "issue_findings.json written"
 pause 1
 
 # ── AGENT 4: Release Notes RAG ───────────────────────────────────────────────
-banner "🤖 Agent 4 / 5 — Release Notes RAG"
+banner "🤖 Agent 4 / 5 - Release Notes RAG"
 step  "Fetches 15 latest Qiskit GitHub releases"
 step  "Parses Deprecated / Removed sections"
 step  "Cross-references IBM/Qiskit deprecation catalog"
-step  "Scans codebase for matches — emits deprecation_findings.json"
+step  "Scans codebase for matches - emits deprecation_findings.json"
 pause 1
 $PYTHON "$SCRIPTS/collect_release_notes.py"
 tick  "deprecation_findings.json written"
 pause 1
 
 # ── AGENT 5: Urgency Scorer ──────────────────────────────────────────────────
-banner "🤖 Agent 5 / 5 — Urgency Scorer"
+banner "🤖 Agent 5 / 5 - Urgency Scorer"
 step  "Merges all 4 findings sources"
 step  "Scores: urgency = (1/days_left) × severity_weight × confidence"
 step  "Ranks + emits scored_findings.json"
@@ -159,19 +159,19 @@ if [ -n "$STREAMLIT_URL" ]; then
   echo ""
   echo "  ${BOLD}Demo walkthrough (in the browser):${RESET}"
   echo "  ┌─────────────────────────────────────────────────────────┐"
-  echo "  │  Tab 1  ⏱  Timeline   — urgency bars, red = critical    │"
-  echo "  │  Tab 2  📅  Calendar   — breakages grouped by month     │"
-  echo "  │  Tab 3  📋  All Findings — sortable table, CSV export   │"
-  echo "  │  Tab 4  🔍  Detail     — migration guidance per finding │"
-  echo "  │  Tab 5  🔧  Auto-Fix   — apply fixes → commit → PR      │"
-  echo "  │  Tab 6  🧪  Backtest   — precision/recall vs qiskit     │"
+  echo "  │  Tab 1  ⏱  Timeline   - urgency bars, red = critical    │"
+  echo "  │  Tab 2  📅  Calendar   - breakages grouped by month     │"
+  echo "  │  Tab 3  📋  All Findings - sortable table, CSV export   │"
+  echo "  │  Tab 4  🔍  Detail     - migration guidance per finding │"
+  echo "  │  Tab 5  🔧  Auto-Fix   - apply fixes → commit → PR      │"
+  echo "  │  Tab 6  🧪  Backtest   - precision/recall vs qiskit     │"
   echo "  └─────────────────────────────────────────────────────────┘"
   echo ""
   echo "  ${BOLD}In the Auto-Fix tab:${RESET}"
-  echo "  Step 1  — triage (auto-fixable vs upstream)"
-  echo "  Step 2  — click ✅ Apply fix for EOL-001 and EOL-002"
-  echo "  Step 3  — upstream items link to GitHub issue form"
-  echo "  Step 4  — progress checklist ticks live; click"
+  echo "  Step 1  - triage (auto-fixable vs upstream)"
+  echo "  Step 2  - click ✅ Apply fix for EOL-001 and EOL-002"
+  echo "  Step 3  - upstream items link to GitHub issue form"
+  echo "  Step 4  - progress checklist ticks live; click"
   echo "            ${BOLD}📦 Commit fixes & push branch${RESET}"
   echo "            then ${BOLD}🚀 Open Pull Request on GitHub →${RESET}"
   echo ""
@@ -184,7 +184,7 @@ if [ -n "$STREAMLIT_URL" ]; then
   fi
   pause 1
 
-  # Show GitHub PR compare URL (no hardcoded branch — will be filled by Step 4)
+  # Show GitHub PR compare URL (no hardcoded branch - will be filled by Step 4)
   echo "  ${DIM}After pushing from the app, GitHub will open at:${RESET}"
   echo "  ${BOLD}${GH_REPO_URL}/compare${RESET}"
   echo "  (The app pre-fills branch, title, and PR body automatically.)"
@@ -202,7 +202,7 @@ else
   echo ""
   echo "  Then re-run:  ${BOLD}bash demo_run.sh${RESET}"
   echo ""
-  echo "  ${DIM}(For a quick local preview only — not for demo recording:)${RESET}"
+  echo "  ${DIM}(For a quick local preview only - not for demo recording:)${RESET}"
   echo "  ${DIM}streamlit run app.py --server.headless true${RESET}"
 fi
 

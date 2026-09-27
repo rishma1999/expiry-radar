@@ -1,5 +1,5 @@
 """
-app.py — Expiry Radar · Streamlit Dashboard
+app.py - Expiry Radar · Streamlit Dashboard
 ---------------------------------------------
 Run:  streamlit run app.py
 """
@@ -136,7 +136,7 @@ def _badge(sev: str) -> str:
 def _bar(days_left, max_days: int = 400) -> str:
     """Render a coloured urgency bar. Clamped to [0, max_days]."""
     if days_left is None:
-        pct = 60  # workaround — no deadline, show as orange-level
+        pct = 60  # workaround - no deadline, show as orange-level
         color = SEV_COLOR["high"]
     elif days_left <= 0:
         pct = 100
@@ -206,8 +206,8 @@ def run_pipeline_streaming(trace_slot, log_slot) -> bool:
     Run each pipeline step sequentially, updating a live Streamlit placeholder
     with a tick-mark trace panel after every step completes.
 
-    trace_slot : st.empty() — receives the growing step checklist
-    log_slot   : st.empty() — receives the raw stdout log accordion
+    trace_slot : st.empty() - receives the growing step checklist
+    log_slot   : st.empty() - receives the raw stdout log accordion
     """
     states: list[str] = ["pending"] * len(PIPELINE_STEPS)
     outputs: list[str] = [""] * len(PIPELINE_STEPS)
@@ -290,7 +290,7 @@ def run_pipeline_streaming(trace_slot, log_slot) -> bool:
 with st.sidebar:
     st.image(
         "https://upload.wikimedia.org/wikipedia/commons/5/51/IBM_logo.svg",
-        width=80,
+        use_container_width=True,
     )
     st.markdown("## 📡 Expiry Radar")
     st.caption("IBM Bob 2.0 Hackathon · Team Project")
@@ -331,7 +331,7 @@ st.divider()
 
 # ── Agentic trace panel (shown when pipeline is triggered) ────────────────────
 if st.session_state.get("show_trace"):
-    st.markdown("## 🤖 Agentic Pipeline — Live Trace")
+    st.markdown("## 🤖 Agentic Pipeline - Live Trace")
     st.caption(
         "Each subagent runs sequentially. Watch the tick marks as each collector "
         "completes and hands off to the next."
@@ -343,7 +343,7 @@ if st.session_state.get("show_trace"):
     ok = run_pipeline_streaming(trace_slot, log_slot)
 
     if ok:
-        st.success("✅  All agents completed. Findings refreshed — scroll down to see results.")
+        st.success("✅  All agents completed. Findings refreshed - scroll down to see results.")
     else:
         st.error("⚠️  One or more agents reported errors. Check the log above.")
 
@@ -408,13 +408,13 @@ tab_timeline, tab_calendar, tab_table, tab_detail, tab_autofix, tab_backtest = s
 ])
 
 # ─────────────────────────────────────────────────────────────────────────────
-# TAB 1 — Timeline (horizontal urgency bars sorted by rank)
+# TAB 1 - Timeline (horizontal urgency bars sorted by rank)
 # ─────────────────────────────────────────────────────────────────────────────
 
 with tab_timeline:
     st.markdown("### Breaking Changes Timeline")
     st.caption(
-        "Bars show urgency — longer/redder = closer to deadline. "
+        "Bars show urgency - longer/redder = closer to deadline. "
         "Workarounds (no deadline) are shown in orange."
     )
 
@@ -431,7 +431,7 @@ with tab_timeline:
         title   = f.get("title", "Untitled")
         fid     = f.get("id", "")
         dl      = f.get("days_left")
-        breaks  = f.get("breaks_on", "—")
+        breaks  = f.get("breaks_on", "-")
         score   = f.get("urgency_score", 0)
         rank    = f.get("rank", "?")
 
@@ -458,7 +458,7 @@ with tab_timeline:
         st.markdown("<div style='margin-bottom:4px'></div>", unsafe_allow_html=True)
 
 # ─────────────────────────────────────────────────────────────────────────────
-# TAB 2 — Calendar (month-grouped list of upcoming breaks)
+# TAB 2 - Calendar (month-grouped list of upcoming breaks)
 # ─────────────────────────────────────────────────────────────────────────────
 
 with tab_calendar:
@@ -496,7 +496,7 @@ with tab_calendar:
             st.markdown(
                 f'<div style="border-left:4px solid {color};padding-left:12px;margin:16px 0 4px">'
                 f'<strong style="font-size:1.05rem">{month_label}</strong> '
-                f'<span style="color:#57606a;font-size:0.85rem">— {len(items)} finding(s)</span>'
+                f'<span style="color:#57606a;font-size:0.85rem">- {len(items)} finding(s)</span>'
                 f'</div>',
                 unsafe_allow_html=True,
             )
@@ -507,7 +507,7 @@ with tab_calendar:
                 dl    = f.get("days_left")
                 dl_s  = f"{dl}d" if dl is not None else "?"
                 st.markdown(
-                    f"&nbsp;&nbsp;{_badge(sev)} {icon} **{f['id']}** — "
+                    f"&nbsp;&nbsp;{_badge(sev)} {icon} **{f['id']}** - "
                     f"{f.get('title','?')} *(in {dl_s})*",
                     unsafe_allow_html=True,
                 )
@@ -519,7 +519,7 @@ with tab_calendar:
                 f'<div style="border-left:4px solid {SEV_COLOR["critical"]};'
                 f'padding-left:12px;margin:20px 0 4px">'
                 f'<strong style="font-size:1.05rem;color:{SEV_COLOR["critical"]}">⚠ Past Due</strong> '
-                f'<span style="color:#57606a;font-size:0.85rem">— {len(past)} finding(s) already overdue</span>'
+                f'<span style="color:#57606a;font-size:0.85rem">- {len(past)} finding(s) already overdue</span>'
                 f'</div>',
                 unsafe_allow_html=True,
             )
@@ -527,13 +527,13 @@ with tab_calendar:
                 sev  = f.get("severity", "unknown")
                 icon = CAT_ICON.get(f.get("category", ""), "•")
                 st.markdown(
-                    f"&nbsp;&nbsp;{_badge(sev)} {icon} **{f['id']}** — "
+                    f"&nbsp;&nbsp;{_badge(sev)} {icon} **{f['id']}** - "
                     f"{f.get('title','?')} *(broke on {f.get('breaks_on','?')})*",
                     unsafe_allow_html=True,
                 )
 
 # ─────────────────────────────────────────────────────────────────────────────
-# TAB 3 — All Findings table
+# TAB 3 - All Findings table
 # ─────────────────────────────────────────────────────────────────────────────
 
 with tab_table:
@@ -549,7 +549,7 @@ with tab_table:
             "Severity":  f.get("severity", "?").upper(),
             "Category":  f.get("category", "?"),
             "Title":     f.get("title", "?"),
-            "Breaks On": f.get("breaks_on") or "—",
+            "Breaks On": f.get("breaks_on") or "-",
             "Days Left": f.get("days_left"),
             "Score":     f.get("urgency_score"),
             "Locations": len(locs),
@@ -578,11 +578,11 @@ with tab_table:
     )
 
 # ─────────────────────────────────────────────────────────────────────────────
-# TAB 4 — Detail drilldown
+# TAB 4 - Detail drilldown
 # ─────────────────────────────────────────────────────────────────────────────
 
 # ─────────────────────────────────────────────────────────────────────────────
-# TAB 5 — Auto-Fix workflow
+# TAB 5 - Auto-Fix workflow
 # ─────────────────────────────────────────────────────────────────────────────
 
 with tab_autofix:
@@ -595,12 +595,12 @@ with tab_autofix:
 
     # ── Step 1: Triage ────────────────────────────────────────────────────────
     st.markdown("---")
-    st.markdown("#### Step 1 — Triage findings by fixability")
+    st.markdown("#### Step 1 - Triage findings by fixability")
 
     # Classify every finding
     FIXABLE     = []   # can be fixed in this repo right now
-    UPSTREAM    = []   # lives in vendored qiskit-machine-learning — needs upstream PR
-    NO_DEADLINE = []   # workarounds — needs manual review
+    UPSTREAM    = []   # lives in vendored qiskit-machine-learning - needs upstream PR
+    NO_DEADLINE = []   # workarounds - needs manual review
 
     for fin in all_findings:
         ev    = fin.get("evidence", {})
@@ -623,19 +623,19 @@ with tab_autofix:
     col_b.markdown(
         f'<div style="text-align:center;padding:10px;background:#f7f8fa;border-radius:8px">'
         f'<div style="font-size:1.8rem;font-weight:700;color:#57606a">{len(UPSTREAM)}</div>'
-        f'<div style="font-size:0.78rem;color:#57606a">Upstream Qiskit — needs upstream PR</div></div>',
+        f'<div style="font-size:0.78rem;color:#57606a">Upstream Qiskit - needs upstream PR</div></div>',
         unsafe_allow_html=True,
     )
     col_c.markdown(
         f'<div style="text-align:center;padding:10px;background:#fff8f0;border-radius:8px">'
         f'<div style="font-size:1.8rem;font-weight:700;color:#fc8d59">{len(NO_DEADLINE)}</div>'
-        f'<div style="font-size:0.78rem;color:#57606a">Stale workarounds — manual review</div></div>',
+        f'<div style="font-size:0.78rem;color:#57606a">Stale workarounds - manual review</div></div>',
         unsafe_allow_html=True,
     )
 
     # ── Step 2: Apply fixes ───────────────────────────────────────────────────
     st.markdown("---")
-    st.markdown("#### Step 2 — Apply fixes")
+    st.markdown("#### Step 2 - Apply fixes")
 
     # Describe what each fixable item needs
     FIX_ACTIONS: dict[str, dict] = {
@@ -686,14 +686,14 @@ with tab_autofix:
             border = SEV_COLOR.get(sev, "#ccc")
             st.markdown(
                 f'<div class="fix-card-done" style="border-color:{border}">'
-                f'{_badge(sev)} <strong>{fid}</strong> — {fin.get("title","")}</div>',
+                f'{_badge(sev)} <strong>{fid}</strong> - {fin.get("title","")}</div>',
                 unsafe_allow_html=True,
             )
 
             if act:
                 c1, c2 = st.columns([3, 1])
                 with c1:
-                    st.markdown(f"**Fix:** `{act['file']}` — `{act['new']}`")
+                    st.markdown(f"**Fix:** `{act['file']}` - `{act['new']}`")
                     st.caption(act["reason"])
                     st.markdown(f"📎 [{act['ref']}]({act['ref']})")
                 with c2:
@@ -717,7 +717,7 @@ with tab_autofix:
 
     # ── Step 3: Upstream items ────────────────────────────────────────────────
     st.markdown("---")
-    st.markdown("#### Step 3 — Upstream Qiskit items")
+    st.markdown("#### Step 3 - Upstream Qiskit items")
     st.caption(
         "These findings live inside the vendored `qiskit-machine-learning` source. "
         "Patching them here would be overwritten on next install. "
@@ -755,7 +755,7 @@ with tab_autofix:
 
             st.markdown(
                 f'<div class="fix-card-upstream">'
-                f'{_badge(sev)} <strong>{fid}</strong> — {fin.get("title","")}</div>',
+                f'{_badge(sev)} <strong>{fid}</strong> - {fin.get("title","")}</div>',
                 unsafe_allow_html=True,
             )
 
@@ -775,211 +775,51 @@ with tab_autofix:
     else:
         st.info("No upstream items in current filters.")
 
-    # ── Step 4: PR creation ───────────────────────────────────────────────────
+    # ── Step 4: PR creation (Seamless Web Flow for Streamlit Cloud) ───────────
     st.markdown("---")
-    st.markdown("#### Step 4 — Create Pull Request")
-
-    # ── Live git state ────────────────────────────────────────────────────────
-    def _git(*args) -> tuple[int, str]:
-        r = subprocess.run(["git"] + list(args), capture_output=True, text=True)
-        return r.returncode, r.stdout.strip()
-
-    # Read live requirements.txt state
+    st.markdown("#### Step 4 - Create Pull Request")
+    
+    # Read live requirements.txt state to check if fixes were clicked
+    def _read_req() -> str:
+        try:
+            with open("requirements.txt") as f:
+                return f.read()
+        except Exception:
+            return ""
+            
     req_content  = _read_req()
     eol001_fixed = "cryptography>=" in req_content
     eol002_fixed = "pydantic>="     in req_content
     fixes_applied = eol001_fixed and eol002_fixed
 
-    # Current branch name
-    _, current_branch = _git("branch", "--show-current")
-    FIX_BRANCH = current_branch if current_branch not in ("", "main") else "fix/eol-pin-dependencies"
-
-    # Check if a local fix branch exists (may differ from current)
-    branch_exists = _git("rev-parse", "--verify", FIX_BRANCH)[0] == 0
-
-    # How many commits ahead of main is the fix branch?
-    _, ahead_str   = _git("rev-list", "--count", f"main..{FIX_BRANCH}")
-    ahead_count    = int(ahead_str or "0") if branch_exists else 0
-
-    # Detect any uncommitted changes to requirements.txt
-    _, diff_text = _git("diff", "HEAD", "--", "requirements.txt")
-    _, diff_staged = _git("diff", "--cached", "--", "requirements.txt")
-
-    # Remote URL → derive GitHub owner/repo
-    _, remote_url = _git("remote", "get-url", "origin")
-    gh_match = re.search(r"github\.com[:/](.+?)(?:\.git)?$", remote_url)
-    gh_repo  = gh_match.group(1) if gh_match else "rishma1999/expiry-radar"
-
-    # ── Progress checklist ────────────────────────────────────────────────────
-    def _step_check(done: bool, label: str, detail: str = "") -> None:
-        icon = "✅" if done else "⬜"
-        st.markdown(
-            f'<div style="padding:6px 12px;margin-bottom:4px;border-radius:6px;'
-            f'background:{"#f0fff4" if done else "#f7f8fa"};'
-            f'border-left:3px solid {"#3fb950" if done else "#e5e7eb"}">'
-            f'<span style="font-size:1rem">{icon}</span> '
-            f'<strong>{label}</strong>'
-            f'{"<br/><span style=\'color:#57606a;font-size:0.8rem;margin-left:20px\'>" + detail + "</span>" if detail else ""}'
-            f'</div>',
-            unsafe_allow_html=True,
-        )
-
-    st.markdown("**Progress checklist:**")
-    _step_check(eol001_fixed,  "EOL-001 fixed",   "`cryptography>=44.0.0` in requirements.txt")
-    _step_check(eol002_fixed,  "EOL-002 fixed",   "`pydantic>=2.0.0` in requirements.txt")
-    _step_check(branch_exists, "Fix branch exists", f"`{FIX_BRANCH}` in local git")
-    _step_check(ahead_count > 0, "Branch ahead of main", f"{ahead_count} commit(s) not yet in main")
-    _step_check(ahead_count > 0, "Branch pushed to GitHub",
-                f"github.com/{gh_repo}/tree/{FIX_BRANCH}")
-
-    st.markdown("")
-
-    # ── Commit & push button (shown when fixes applied, branch not yet pushed) ─
-    if fixes_applied and not (branch_exists and ahead_count > 0):
+    if fixes_applied:
         st.info(
-            "🔵  Fixes are applied locally. Click below to commit them to a fix branch "
-            "and push to GitHub so you can open the PR."
+            "🔵  Fixes have been verified. Because we are running on Streamlit Cloud, "
+            "we jump straight to GitHub to commit them and open the PR seamlessly."
         )
 
-        commit_msg = (
-            "fix(deps): pin cryptography>=44.0.0 and pydantic>=2.0.0\n\n"
-            "EOL-001: cryptography <44 reached EOL 2026-10-01\n"
-            "EOL-002: pydantic v1 reached EOL 2024-06-30 (819 days past due)\n\n"
-            "Auto-fixed by Expiry Radar (IBM Bob 2.0 Hackathon)"
-        )
-
-        if st.button("📦  Commit fixes & push branch", type="primary", use_container_width=False):
-            step_slot = st.empty()
-
-            COMMIT_STEPS = [
-                (["git", "stash"], "Stash any in-progress changes"),
-                (["git", "checkout", "-b", FIX_BRANCH], f"Create branch `{FIX_BRANCH}`"),
-                (["git", "stash", "pop"], "Restore changes onto new branch"),
-                (["git", "add", "requirements.txt"], "Stage requirements.txt"),
-                (["git", "commit", "-m", commit_msg], "Commit with fix message"),
-                (["git", "push", "origin", FIX_BRANCH], f"Push to origin/{FIX_BRANCH}"),
-            ]
-
-            step_states = ["pending"] * len(COMMIT_STEPS)
-            step_outputs = [""] * len(COMMIT_STEPS)
-
-            def _render_commit_trace():
-                lines = ['<div class="agent-panel">',
-                         '<span style="color:#58a6ff;font-weight:700">🔧 Commit & Push Pipeline</span><br/>']
-                for j, (_, lbl) in enumerate(COMMIT_STEPS):
-                    s = step_states[j]
-                    icon_m = {"pending": "○", "running": "◌", "done": "✔", "error": "✖"}[s]
-                    cls_m  = {"pending": "agent-step-pending", "running": "agent-step-running",
-                              "done": "agent-step-done", "error": "agent-step-error"}[s]
-                    lines.append(f'<span class="{cls_m}">{icon_m} {lbl}</span><br/>')
-                    if step_outputs[j]:
-                        safe = step_outputs[j].replace("&","&amp;").replace("<","&lt;").replace(">","&gt;")
-                        for ol in safe.splitlines():
-                            lines.append(f'<span class="agent-step-output">&nbsp;&nbsp;{ol}</span><br/>')
-                lines.append("</div>")
-                step_slot.markdown("\n".join(lines), unsafe_allow_html=True)
-
-            push_ok = True
-            for j, (cmd, _) in enumerate(COMMIT_STEPS):
-                step_states[j] = "running"
-                _render_commit_trace()
-                res = subprocess.run(cmd, capture_output=True, text=True)
-                if res.returncode == 0:
-                    step_states[j] = "done"
-                    step_outputs[j] = res.stdout.strip() or "(ok)"
-                else:
-                    step_states[j] = "error"
-                    step_outputs[j] = (res.stdout + " " + res.stderr).strip()[:250]
-                    # stash pop failure on empty stash is non-fatal
-                    if "stash" in " ".join(cmd) and "No stash" in step_outputs[j]:
-                        step_states[j] = "done"
-                        step_outputs[j] = "(nothing to restore)"
-                    else:
-                        push_ok = False
-                _render_commit_trace()
-                if not push_ok:
-                    break
-
-            if push_ok:
-                st.session_state["branch_pushed"] = True
-                st.success(f"✅  Branch `{FIX_BRANCH}` pushed to GitHub!")
-                st.rerun()
-            else:
-                st.error("A step failed — check the trace above.")
-
-    # ── PR box ────────────────────────────────────────────────────────────────
-    pushed = st.session_state.get("branch_pushed") or (branch_exists and ahead_count > 0)
-
-    pr_title  = "fix(deps): pin cryptography>=44.0.0 and pydantic>=2.0.0 [Expiry Radar auto-fix]"
-    pr_body   = (
-        "## Expiry Radar Auto-Fix\n\n"
-        "Findings auto-remediated by [Expiry Radar](https://github.com/rishma1999/expiry-radar) "
-        "(IBM Bob 2.0 Hackathon).\n\n"
-        "### Fixes\n"
-        "| Finding | Change | Reason |\n"
-        "|---------|--------|--------|\n"
-        "| EOL-001 | `cryptography` → `cryptography>=44.0.0` | <44 reached EOL 2026-10-01 |\n"
-        "| EOL-002 | `pydantic` → `pydantic>=2.0.0` | v1 EOL was 2024-06-30 (819 days past due) |\n\n"
-        "### Remaining items (upstream)\n"
-        "DEP-001–006, ISS-001–002 live in vendored `qiskit-machine-learning` — "
-        "upstream issues filed separately.\n\n"
-        "### Test results\n"
-        "All 5 pipeline collectors pass with exit 0. "
-        "`scored_findings.json` schema-valid against `finding-schema.json`."
-    )
-
-    from urllib.parse import quote
-    pr_url = (
-        f"https://github.com/{gh_repo}/compare/main...{quote(FIX_BRANCH, safe='')}"
-        f"?expand=1"
-        f"&title={quote(pr_title, safe='')}"
-        f"&body={quote(pr_body, safe='')}"
-    )
-
-    st.markdown("---")
-    st.markdown("**Pull Request:**")
-
-    # Live PR status card
-    status_label = "✅ Ready to merge" if pushed else "⏳ Waiting — apply fixes & push first"
-    status_color = "#3fb950" if pushed else "#f0a500"
-
-    st.markdown(
-        f'<div class="pr-box">'
-        f'<span style="color:#58a6ff">repository &nbsp;</span> {gh_repo}<br/>'
-        f'<span style="color:#58a6ff">base       &nbsp;</span> main<br/>'
-        f'<span style="color:#58a6ff">head       &nbsp;</span> {FIX_BRANCH}<br/>'
-        f'<span style="color:#58a6ff">ahead      &nbsp;</span> {ahead_count} commit(s)<br/>'
-        f'<span style="color:#58a6ff">title      &nbsp;</span> {pr_title}<br/>'
-        f'<span style="color:{status_color}">status     &nbsp;</span> {status_label}'
-        f'</div>',
-        unsafe_allow_html=True,
-    )
-
-    st.markdown("")
-
-    if pushed:
-        st.link_button(
-            "🚀  Open Pull Request on GitHub →",
-            pr_url,
-            type="primary",
-            use_container_width=False,
-        )
+        gh_repo = "rishma1999/expiry-radar"
+        gh_edit_url = f"https://github.com/{gh_repo}/edit/main/requirements.txt"
+        
+        st.markdown(f'''
+        <a href="{gh_edit_url}" target="_blank" style="text-decoration:none;">
+            <div style="background-color:#2ea043;color:white;padding:12px 20px;text-align:center;border-radius:6px;font-weight:600;margin-top:10px;margin-bottom:10px;font-size:16px;">
+                🚀 Jump to GitHub to Create PR
+            </div>
+        </a>
+        ''', unsafe_allow_html=True)
+        
         st.caption(
-            "Opens GitHub with branch, title, and PR body pre-filled. "
-            "Review and click **Create pull request** — no CLI or OTP required."
+            "**How it works:** This will open `requirements.txt` directly on GitHub. "
+            "Simply change `cryptography` to `cryptography>=44.0.0` and `pydantic` to `pydantic>=2.0.0`, "
+            "then click **Commit changes...** to instantly create a Pull Request!"
         )
     else:
-        st.button(
-            "🚀  Open Pull Request on GitHub →",
-            disabled=True,
-            help="Apply fixes (Step 2) and push the branch first.",
-            use_container_width=False,
-        )
-        st.caption("The button will activate once the fix branch is pushed.")
+        st.warning("Apply the fixes in Step 2 above first, then the PR creation link will appear here.")
 
     # Upstream summary table
     st.markdown("---")
-    st.markdown("#### Summary — What's been fixed vs what needs upstream work")
+    st.markdown("#### Summary - What's been fixed vs what needs upstream work")
 
     import pandas as pd
     fix_rows = []
@@ -1026,7 +866,7 @@ with tab_detail:
         st.markdown(
             f'<div class="finding-card" style="border-color:{border_col};background:{bg_col};">'
             f'{_badge(sev)}'
-            f'<strong style="font-size:1.1rem">{f.get("id")} — {f.get("title")}</strong>'
+            f'<strong style="font-size:1.1rem">{f.get("id")} - {f.get("title")}</strong>'
             f'</div>',
             unsafe_allow_html=True,
         )
@@ -1044,7 +884,7 @@ with tab_detail:
         with col_l:
             st.markdown("**Finding info**")
             st.markdown(f"- **Category:** {CAT_ICON.get(f.get('category',''), '')} {f.get('category','?')}")
-            st.markdown(f"- **Breaks on:** {f.get('breaks_on') or '—'}")
+            st.markdown(f"- **Breaks on:** {f.get('breaks_on') or '-'}")
             st.markdown(f"- **Confidence:** {f.get('confidence', '?')}")
             st.markdown(f"- **Fix type:** {f.get('fix', '?')}")
             st.markdown(f"- **Status:** {f.get('status', '?')}")
@@ -1080,7 +920,7 @@ with tab_detail:
             st.json(f)
 
 # ─────────────────────────────────────────────────────────────────────────────
-# TAB 6 — Backtesting
+# TAB 6 - Backtesting
 # ─────────────────────────────────────────────────────────────────────────────
 
 with tab_backtest:
@@ -1088,11 +928,11 @@ with tab_backtest:
     _sys.path.insert(0, SCRIPTS_DIR)
     from backtest import run_backtest
 
-    st.markdown("### 🧪 Backtest — Did Expiry Radar work?")
+    st.markdown("### 🧪 Backtest - Did Expiry Radar work?")
     st.caption(
         "Simulates running Expiry Radar against **qiskit-machine-learning 0.6.0** "
         "(March 2023) and checks how accurately it would have predicted the breakages "
-        "that shipped in **0.7.0** (November 2023) — 7.5 months later."
+        "that shipped in **0.7.0** (November 2023) - 7.5 months later."
     )
 
     r = run_backtest()
@@ -1158,19 +998,19 @@ with tab_backtest:
     with col_legend:
         st.markdown("**What each result means**")
         st.markdown(
-            "- 🟢 **TP** — Radar flagged it *and* it actually broke → the tool earned its keep\n"
-            "- 🟡 **FP** — Radar flagged it but it didn't break in 0.7.0 → still future-relevant "
+            "- 🟢 **TP** - Radar flagged it *and* it actually broke → the tool earned its keep\n"
+            "- 🟡 **FP** - Radar flagged it but it didn't break in 0.7.0 → still future-relevant "
             "  (BaseSamplerV1 / BaseEstimatorV1 will break in Qiskit 3.0)\n"
-            "- 🔴 **FN** — Radar missed it → `TorchRuntimeClient` & `distribution_learners` "
+            "- 🔴 **FN** - Radar missed it → `TorchRuntimeClient` & `distribution_learners` "
             "  are module-level removals not caught by symbol-name scanning\n"
-            "- ⚫ **TN** — Correctly not flagged"
+            "- ⚫ **TN** - Correctly not flagged"
         )
         st.markdown(
             f'<div style="margin-top:14px;padding:10px 14px;background:#f0fff4;'
             f'border-radius:6px;border-left:3px solid #3fb950;font-size:0.85rem">'
             f'<strong>Lead time</strong>: Radar would have alerted developers '
             f'<strong>{r["avg_lead_days"]} days ({r["avg_lead_months"]} months) '
-            f'before the 0.7.0 release</strong> — enough time to migrate before the breakage.'
+            f'before the 0.7.0 release</strong> - enough time to migrate before the breakage.'
             f'</div>',
             unsafe_allow_html=True,
         )
@@ -1215,7 +1055,7 @@ with tab_backtest:
     with st.expander("📐  Methodology"):
         st.markdown(f"""
 **Snapshot**: qiskit-machine-learning **{r['snapshot']}** (released {r['snapshot_date']})
-— the codebase state Expiry Radar is simulated against.
+- the codebase state Expiry Radar is simulated against.
 
 **Ground truth**: All symbols officially removed in **{r['evaluated_against']}**
 (released {r['evaluation_date']}) per the GitHub release notes.
@@ -1225,12 +1065,12 @@ in Python source files using regex import/usage patterns.
 
 **Known gap (FN)**: Module-level package removals (`TorchRuntimeClient`,
 `distribution_learners`) are not caught because there are no matching import
-statements in the surviving 1.0.0 codebase — they were fully removed before
+statements in the surviving 1.0.0 codebase - they were fully removed before
 the current snapshot. A future improvement would scan historical import graphs.
 
 **FP note**: `BaseSamplerV1` and `BaseEstimatorV1` are flagged as FP against
 the 0.7.0 ground truth because they were deprecated *later* (qiskit 1.2, 2024).
-They are genuine future breakages — not false positives in practice.
+They are genuine future breakages - not false positives in practice.
 
 **Metrics computed**:
 - Precision = TP / (TP + FP) = {r['tp']} / {r['tp']+r['fp']} = **{r['precision']:.1%}**

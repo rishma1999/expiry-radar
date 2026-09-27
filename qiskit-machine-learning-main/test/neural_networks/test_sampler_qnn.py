@@ -467,7 +467,7 @@ class TestSamplerQNN(QiskitMachineLearningTestCase):
         qc.measure_all()
 
         # Transpile to an 8-qubit backend, forcing logical qubits
-        # to physical positions [5, 7] — deliberately high to
+        # to physical positions [5, 7] - deliberately high to
         # trigger the bug
         pm = generate_preset_pass_manager(
             optimization_level=1,

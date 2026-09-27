@@ -2,19 +2,19 @@
 
 > *Everything in a codebase has a hidden expiration date. We find it before production does.*
 
-IBM Bob 2.0 Hackathon — **Expiry Radar** scans a codebase for end-of-life dependencies, deprecated Qiskit APIs, stale workarounds for closed GitHub issues, and hardcoded expiry dates — then ranks them by urgency and auto-fixes the highest-severity ones with a single click.
+IBM Bob 2.0 Hackathon - **Expiry Radar** scans a codebase for end-of-life dependencies, deprecated Qiskit APIs, stale workarounds for closed GitHub issues, and hardcoded expiry dates - then ranks them by urgency and auto-fixes the highest-severity ones with a single click.
 
 ---
 
 ## Live Demo
 
-**Streamlit Cloud app:** _(deploy from [share.streamlit.io](https://share.streamlit.io) — repo: this repo, file: `app.py`)_
+**Streamlit Cloud app:** _(deploy from [share.streamlit.io](https://share.streamlit.io) - repo: this repo, file: `app.py`)_
 
 **GitHub repository:** [github.com/rishma1999/expiry-radar](https://github.com/rishma1999/expiry-radar)
 
 ---
 
-## Demo Script — Step by Step
+## Demo Script - Step by Step
 
 ### 0 · One-time setup
 
@@ -74,7 +74,7 @@ Open your Streamlit Cloud URL. Click through the 6 tabs:
 
 | Tab | What to show |
 |---|---|
-| **⏱ Timeline** | Urgency bars — red bars = critical, longer = closer to deadline |
+| **⏱ Timeline** | Urgency bars - red bars = critical, longer = closer to deadline |
 | **📅 Calendar** | Findings grouped by the month they break |
 | **📋 All Findings** | Sortable table, download as CSV |
 | **🔍 Detail** | Click any finding: migration guidance, all file locations, raw JSON |
@@ -87,18 +87,18 @@ Open your Streamlit Cloud URL. Click through the 6 tabs:
 
 In the **🔧 Auto-Fix** tab:
 
-**Step 1 — Triage**  
+**Step 1 - Triage**  
 The app classifies every finding: auto-fixable in this repo vs upstream Qiskit.
 
-**Step 2 — Apply fixes**  
+**Step 2 - Apply fixes**  
 Click **✅ Apply fix** for:
 - `EOL-001` → pins `cryptography>=44.0.0` (was EOL 2026-10-01)
 - `EOL-002` → pins `pydantic>=2.0.0` (v1 was EOL 2024-06-30, 819 days past due)
 
-**Step 3 — Upstream items**  
+**Step 3 - Upstream items**  
 Each upstream Qiskit finding has a **↗ File upstream issue** button that opens GitHub's new-issue form pre-filled with the migration guidance.
 
-**Step 4 — Create Pull Request**
+**Step 4 - Create Pull Request**
 
 Watch the progress checklist tick live:
 ```
@@ -109,7 +109,7 @@ Watch the progress checklist tick live:
 ⬜ Branch pushed         github.com/rishma1999/expiry-radar/tree/fix/eol-pin-dependencies
 ```
 
-Click **📦 Commit fixes & push branch** — watch the agentic commit trace panel:
+Click **📦 Commit fixes & push branch** - watch the agentic commit trace panel:
 ```
 🔧 Commit & Push Pipeline
 ✔ Stash any in-progress changes
@@ -185,6 +185,6 @@ The collectors do cheap, deterministic scanning. The AI layer (Bob) does reasoni
 ## Security
 
 - `.gitignore` and `.bobignore` block all credential file patterns (IBM Cloud API keys, `.env`, `*.pem`, `*.key`, GitHub tokens)
-- Pipeline output JSONs (`*_findings.json`, `scored_findings.json`) are gitignored — they contain local file paths and are regenerated on each run
+- Pipeline output JSONs (`*_findings.json`, `scored_findings.json`) are gitignored - they contain local file paths and are regenerated on each run
 - No secrets are hardcoded anywhere in the codebase
 

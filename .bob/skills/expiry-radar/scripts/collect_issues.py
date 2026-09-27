@@ -1,5 +1,5 @@
 """
-collect_issues.py — Expiry Radar GitHub issue collector
+collect_issues.py - Expiry Radar GitHub issue collector
 ---------------------------------------------------------
 Scans all Python, Markdown, and RST files in the target codebase for
 GitHub issue URLs embedded in code comments, docstrings, and inline
@@ -16,7 +16,7 @@ For every unique issue URL found it:
      format, ready for the Expiry Radar scoring pipeline.
 
 Environment variable:
-    GITHUB_TOKEN — optional; set to avoid GitHub API rate-limits (60 req/hr
+    GITHUB_TOKEN - optional; set to avoid GitHub API rate-limits (60 req/hr
                    unauthenticated vs 5 000 req/hr authenticated).
 
 Usage:
@@ -230,7 +230,7 @@ def build_findings(refs: list[dict]) -> list[dict]:
                     f"{first['owner']}/{first['repo']}#{first['number']}: "
                     f"{first['issue_title'][:60]}"
                 ),
-                "breaks_on": None,          # no hard deadline — upstream already fixed
+                "breaks_on": None,          # no hard deadline - upstream already fixed
                 "days_left": None,
                 "severity": _severity(days_stale),
                 "confidence": 0.8,
@@ -258,11 +258,11 @@ def main(root: str = ".") -> None:
     root_path = Path(root).resolve()
     print(f"[collect_issues] Scanning {root_path} …")
 
-    # Phase 1 — collect all issue references
+    # Phase 1 - collect all issue references
     refs = scan_tree(root_path)
     print(f"[collect_issues] Found {len(refs)} issue URL reference(s) in code.")
 
-    # Phase 2 — enrich with GitHub API
+    # Phase 2 - enrich with GitHub API
     refs = enrich(refs)
 
     # Write full candidate list
@@ -270,7 +270,7 @@ def main(root: str = ".") -> None:
         json.dump(refs, f, indent=2)
     print(f"[collect_issues] Written {len(refs)} candidates → issue_candidates.json")
 
-    # Phase 3 — build findings (closed issues with live workarounds)
+    # Phase 3 - build findings (closed issues with live workarounds)
     findings = build_findings(refs)
 
     with open("issue_findings.json", "w") as f:

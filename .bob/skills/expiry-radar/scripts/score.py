@@ -1,11 +1,11 @@
 """
-score.py — Expiry Radar unified scorer
+score.py - Expiry Radar unified scorer
 ----------------------------------------
 Merges findings from all collectors:
-    eol_findings.json          — end-of-life dependencies
-    deprecation_findings.json  — deprecated Qiskit/IBM symbols
-    issue_findings.json        — stale workarounds for closed GitHub issues
-    todo_findings.json         — hardcoded dates / TODOs (may be empty)
+    eol_findings.json          - end-of-life dependencies
+    deprecation_findings.json  - deprecated Qiskit/IBM symbols
+    issue_findings.json        - stale workarounds for closed GitHub issues
+    todo_findings.json         - hardcoded dates / TODOs (may be empty)
 
 Scoring formula
 ---------------
@@ -22,7 +22,7 @@ scaled by severity weight.
 
 Outputs
 -------
-    scored_findings.json  — merged list, sorted by urgency_score descending,
+    scored_findings.json  - merged list, sorted by urgency_score descending,
                             each entry augmented with `urgency_score` and `rank`.
 """
 
@@ -50,7 +50,7 @@ def _load_all() -> list[dict]:
             try:
                 data = json.load(f)
             except json.JSONDecodeError:
-                print(f"[score] Warning: could not parse {path} — skipping.")
+                print(f"[score] Warning: could not parse {path} - skipping.")
                 continue
         if isinstance(data, list):
             findings.extend(data)

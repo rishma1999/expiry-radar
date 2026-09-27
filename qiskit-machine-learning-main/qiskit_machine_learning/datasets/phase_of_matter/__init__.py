@@ -17,10 +17,10 @@ Quantum Phase of Matter classification dataset generator.
 
 Each supported model lives in its own module:
 
-* :mod:`._heisenberg` — Bond-alternating XXX Heisenberg chain
-* :mod:`._haldane`    — Haldane chain
-* :mod:`._annni`      — Axial Next-Nearest-Neighbor Ising (ANNNI) model
-* :mod:`._cluster`    — Cluster Hamiltonian
+* :mod:`._heisenberg` - Bond-alternating XXX Heisenberg chain
+* :mod:`._haldane`    - Haldane chain
+* :mod:`._annni`      - Axial Next-Nearest-Neighbor Ising (ANNNI) model
+* :mod:`._cluster`    - Cluster Hamiltonian
 
 The :func:`phase_of_matter_data` function is the single public entry point.
 """

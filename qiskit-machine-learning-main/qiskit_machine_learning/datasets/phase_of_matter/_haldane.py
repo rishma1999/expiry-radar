@@ -41,9 +41,9 @@ def build_hamiltonian(n: int, h1: float, h2: float, j: float = 1.0) -> SparsePau
     Phase diagram (see Fig. 4 in the reference, :math:`h_1/J` vs
     :math:`h_2/J`):
 
-    * **antiferromagnetic** — small :math:`h_1`, negative :math:`h_2`
-    * **paramagnetic** — large :math:`h_1`
-    * **spt** (symmetry-protected topological) — small :math:`h_1`,
+    * **antiferromagnetic** - small :math:`h_1`, negative :math:`h_2`
+    * **paramagnetic** - large :math:`h_1`
+    * **spt** (symmetry-protected topological) - small :math:`h_1`,
       positive :math:`h_2 > 0.423` (at :math:`h_1 = 0.5`)
 
     Args:
